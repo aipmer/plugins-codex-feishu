@@ -4,6 +4,12 @@
 
 [English README](./README.md)
 
+## 维护者
+
+- 个人站点：[pmer.cn](https://pmer.cn)
+- X 账号：[@ai_pmer](https://x.com/ai_pmer)
+- 关联开源项目：[Codex 蓝皮书](https://github.com/hunkwu/book)
+
 ## 预览
 
 ![Feishu 插件详情页](./plugins/feishu/assets/screenshots/plugin-detail-real.png)
@@ -133,3 +139,7 @@ plugins/feishu/scripts/doctor-feishu-auth.sh
 - 稳定本地 MCP 已直接封装高频的 IM、Docs、Wiki、Contacts 能力。
 - 更少用或更专门的接口仍然可以通过 `feishu_openapi_request` 调用。
 - 这个仓库的目标是让用户可以直接用 GitHub 仓库地址导入 Codex 插件市场。
+
+## 关联项目
+
+- [hunkwu/book](https://github.com/hunkwu/book) - Codex 蓝皮书，聚焦 Codex 工作流、多端编排和 AI 原生产品落地。

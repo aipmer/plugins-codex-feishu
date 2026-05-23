@@ -4,6 +4,12 @@ Open-source Feishu plugin for Codex, designed for high-frequency team collaborat
 
 [中文说明](./README.zh-CN.md)
 
+## Maintainer
+
+- Personal site: [pmer.cn](https://pmer.cn)
+- X: [@ai_pmer](https://x.com/ai_pmer)
+- Related open-source project: [Codex Blue Book](https://github.com/hunkwu/book)
+
 ## Preview
 
 ![Feishu plugin detail page](./plugins/feishu/assets/screenshots/plugin-detail-real.png)
@@ -133,3 +139,7 @@ The upstream beta server is preserved as `lark-mcp-official-beta` for comparison
 - The stable local MCP directly wraps the high-frequency IM, Docs, Wiki, and Contacts flows.
 - Less common endpoints can still be reached through `feishu_openapi_request`.
 - The repository is intended to be importable directly from GitHub as a Codex plugin marketplace source.
+
+## Related Project
+
+- [hunkwu/book](https://github.com/hunkwu/book) - Codex Blue Book, focused on Codex workflows, multi-surface orchestration, and AI-native product delivery.

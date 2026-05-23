@@ -3,10 +3,10 @@
   "version": "0.1.0",
   "description": "Open-source Feishu plugin for Codex with stable IM, Docs, Wiki, and team workflow capabilities.",
   "author": {
-    "name": "Feishu for Codex Community",
-    "url": "https://github.com/hunkwu/plugins-codex-feishu"
+    "name": "Hunk Wu",
+    "url": "https://pmer.cn"
   },
-  "homepage": "https://github.com/hunkwu/plugins-codex-feishu",
+  "homepage": "https://pmer.cn",
   "repository": "https://github.com/hunkwu/plugins-codex-feishu",
   "license": "Apache-2.0",
   "keywords": [
@@ -25,13 +25,13 @@
     "displayName": "Feishu",
     "shortDescription": "Summarize chats, search docs, and push Codex updates to Feishu.",
     "longDescription": "Feishu for Codex is an open-source plugin for teams that use Feishu or Lark for collaboration. It provides stable OpenAPI-backed tools for chat summaries, bot-style conversations, Docs and Wiki retrieval, and periodic project digests pushed from Codex into Feishu.",
-    "developerName": "Feishu for Codex Community",
+    "developerName": "Hunk Wu",
     "category": "Productivity",
     "capabilities": [
       "Interactive",
       "Write"
     ],
-    "websiteURL": "https://github.com/hunkwu/plugins-codex-feishu",
+    "websiteURL": "https://pmer.cn",
     "privacyPolicyURL": "https://www.feishu.cn/privacy",
     "termsOfServiceURL": "https://www.feishu.cn/terms",
     "defaultPrompt": [
