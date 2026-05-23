@@ -6,9 +6,11 @@
 
 ## 预览
 
-![Feishu for Codex 仓库概览](./plugins/feishu/assets/screenshots/github-repo-overview.png)
+![Feishu 插件详情页](./plugins/feishu/assets/screenshots/plugin-detail-real.png)
 
-![在 Codex 中导入](./plugins/feishu/assets/screenshots/codex-import-marketplace.png)
+![在 Codex 中安装 Feishu 插件](./plugins/feishu/assets/screenshots/plugin-install-real.png)
+
+![Feishu for Codex 仓库概览](./plugins/feishu/assets/screenshots/github-repo-overview.png)
 
 ## 解决什么问题
 

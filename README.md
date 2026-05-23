@@ -6,9 +6,11 @@ Open-source Feishu plugin for Codex, designed for high-frequency team collaborat
 
 ## Preview
 
-![Feishu for Codex repository overview](./plugins/feishu/assets/screenshots/github-repo-overview.png)
+![Feishu plugin detail page](./plugins/feishu/assets/screenshots/plugin-detail-real.png)
 
-![Install in Codex](./plugins/feishu/assets/screenshots/codex-import-marketplace.png)
+![Install Feishu plugin in Codex](./plugins/feishu/assets/screenshots/plugin-install-real.png)
+
+![Feishu for Codex repository overview](./plugins/feishu/assets/screenshots/github-repo-overview.png)
 
 ## What it solves
 

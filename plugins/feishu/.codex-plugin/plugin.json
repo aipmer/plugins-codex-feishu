@@ -41,6 +41,11 @@
     ],
     "brandColor": "#00A5E8",
     "composerIcon": "./assets/icon.png",
-    "logo": "./assets/logo.png"
+    "logo": "./assets/logo.png",
+    "screenshots": [
+      "./assets/screenshots/plugin-detail-real.png",
+      "./assets/screenshots/plugin-install-real.png",
+      "./assets/screenshots/github-repo-overview.png"
+    ]
   }
 }
