@@ -4,6 +4,12 @@
 
 [English README](./README.md)
 
+## 预览
+
+![Feishu for Codex 仓库概览](./plugins/feishu/assets/screenshots/github-repo-overview.png)
+
+![在 Codex 中导入](./plugins/feishu/assets/screenshots/codex-import-marketplace.png)
+
 ## 解决什么问题
 
 - 总结飞书群聊最近消息

@@ -4,6 +4,12 @@ Open-source Feishu plugin for Codex, designed for high-frequency team collaborat
 
 [中文说明](./README.zh-CN.md)
 
+## Preview
+
+![Feishu for Codex repository overview](./plugins/feishu/assets/screenshots/github-repo-overview.png)
+
+![Install in Codex](./plugins/feishu/assets/screenshots/codex-import-marketplace.png)
+
 ## What it solves
 
 - Summarize recent messages from Feishu group chats
