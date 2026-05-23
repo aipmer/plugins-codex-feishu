@@ -39,6 +39,8 @@
       "Search Feishu Docs and Wiki for this topic.",
       "Draft a Codex project update and send it to Feishu."
     ],
-    "brandColor": "#00A5E8"
+    "brandColor": "#00A5E8",
+    "composerIcon": "./assets/icon.png",
+    "logo": "./assets/logo.png"
   }
 }
