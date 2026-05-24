@@ -67,6 +67,8 @@ Use `plugins/feishu` as the sparse path when importing from Git.
 
 ## Install in Codex
 
+For regular users, the recommended path is to add this GitHub repository directly in Codex. You do not need to run `git clone` first.
+
 In `Add Plugin Marketplace`:
 
 - Source: `https://github.com/hunkwu/plugins-codex-feishu.git`
@@ -76,6 +78,34 @@ In `Add Plugin Marketplace`:
 If your Codex build expects a repo-local marketplace file, use:
 
 - Marketplace path: `.agents/plugins/marketplace.json`
+
+After the marketplace is added, the plugin appears under `Codex Community`. That display name comes from this repository's `.agents/plugins/marketplace.json`.
+
+### Built by OpenAI / Codex Community / Personal
+
+- `Built by OpenAI`: official built-in plugins maintained by OpenAI.
+- `Codex Community`: the community plugin marketplace added from this GitHub repository. This is the recommended path for open-source distribution.
+- `Personal`: your local personal plugin directory. Use this for local development, debugging, or private plugins.
+
+Most users only need the `Codex Community` install. You do not need to install a second copy under `Personal`. Use the developer path below only if you want to modify or contribute to the plugin.
+
+### Developer Local Install
+
+If you want to contribute code, debug scripts, or modify the plugin, clone the repository:
+
+```bash
+git clone https://github.com/hunkwu/plugins-codex-feishu.git
+cd plugins-codex-feishu
+scripts/smoke-test.sh
+```
+
+If you need to sync the repository plugin into your local personal plugin runtime:
+
+```bash
+scripts/sync-local-plugin.sh
+```
+
+This syncs `plugins/feishu` one-way into the default local runtime directory. Regular install users do not need this step.
 
 ## Setup
 

@@ -67,6 +67,8 @@ plugins/feishu/
 
 ## 在 Codex 中安装
 
+普通用户推荐直接在 Codex 里通过 GitHub 仓库添加插件市场，不需要先手动执行 `git clone`。
+
 在 `Add Plugin Marketplace` 中填写：
 
 - Source：`https://github.com/hunkwu/plugins-codex-feishu.git`
@@ -76,6 +78,34 @@ plugins/feishu/
 如果当前 Codex 版本需要 repo-local marketplace 文件，则使用：
 
 - Marketplace path：`.agents/plugins/marketplace.json`
+
+添加成功后，插件会出现在 `Codex Community` 这个市场下。这个名称来自仓库内的 `.agents/plugins/marketplace.json`。
+
+### Built by OpenAI / Codex Community / Personal 的区别
+
+- `Built by OpenAI`：Codex 官方内置插件，通常由 OpenAI 维护。
+- `Codex Community`：从这个 GitHub 仓库添加的社区插件市场，适合开源分发和普通用户安装。
+- `Personal`：用户本机个人插件目录，适合自己本地开发、调试或未公开插件。
+
+一般用户只需要安装 `Codex Community` 这一份，不需要再安装到 `Personal`。如果你要参与开发或修改插件源码，再使用下面的开发者方式。
+
+### 开发者本地安装
+
+如果你要贡献代码、调试脚本或修改插件，可以先克隆仓库：
+
+```bash
+git clone https://github.com/hunkwu/plugins-codex-feishu.git
+cd plugins-codex-feishu
+scripts/smoke-test.sh
+```
+
+如果需要把仓库内插件同步到本机个人插件目录：
+
+```bash
+scripts/sync-local-plugin.sh
+```
+
+这会把 `plugins/feishu` 单向同步到默认的本地运行时目录。普通安装用户不需要执行这一步。
 
 ## 配置步骤
 
