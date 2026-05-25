@@ -66,3 +66,14 @@ data:
     Title: "Ship Feishu plugin MVP"
     Status: "Todo"
 ```
+
+## Project Operation Templates
+
+Recommended v0.3 tables:
+
+- Project status
+- Release records
+- Risk tracker
+- Case study intake
+
+See `examples/bitable-project-templates.md` for fields and record examples.

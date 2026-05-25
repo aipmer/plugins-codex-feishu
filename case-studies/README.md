@@ -14,6 +14,12 @@ This directory collects practical case studies, especially stories about:
 - Launching quickly, validating demand, getting first users, or earning first revenue.
 - Debugging failures that other builders can learn from.
 
+## Starter Case Studies
+
+- [Private Assistant Push For Codex Project Updates](./2026-05-25-private-assistant-push.md)
+- [Long-Connection Message Bot Quickstart](./2026-05-25-message-bot-quickstart.md)
+- [Docs/Wiki Retrieval And Write-Back](./2026-05-25-docs-wiki-writeback.md)
+
 ## How To Submit
 
 1. Copy [`TEMPLATE.md`](./TEMPLATE.md).
@@ -57,6 +63,12 @@ The goal is not to make every story look successful. Honest postmortems are valu
 - 持续调优 `AGENTS.md`，让 Codex 在真实 repo 中更稳定。
 - 快速上线、验证需求、获得第一批用户或赚到第一笔收入。
 - 记录失败排查过程，让其他开发者少踩坑。
+
+## 初始案例
+
+- [Codex 项目更新的私人助理推送](./2026-05-25-private-assistant-push.md)
+- [长连接消息机器人快速接入](./2026-05-25-message-bot-quickstart.md)
+- [Docs/Wiki 检索与写回](./2026-05-25-docs-wiki-writeback.md)
 
 ## 如何投稿
 

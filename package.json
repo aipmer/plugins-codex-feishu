@@ -1,0 +1,18 @@
+{
+  "name": "plugins-codex-feishu",
+  "version": "0.1.1",
+  "private": true,
+  "description": "Feishu plugin for Codex with quick message bot verification scripts.",
+  "license": "MIT",
+  "type": "commonjs",
+  "scripts": {
+    "feishu:doctor": "node scripts/feishu-doctor.js",
+    "feishu:bot": "node plugins/feishu/scripts/feishu-long-connection-bot.js",
+    "feishu:project-update": "node plugins/feishu/scripts/feishu-project-update.js",
+    "smoke": "scripts/smoke-test.sh"
+  },
+  "dependencies": {
+    "@larksuiteoapi/node-sdk": "^1.65.0",
+    "dotenv": "^17.2.3"
+  }
+}

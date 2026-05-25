@@ -23,9 +23,88 @@ Open-source Feishu plugin for Codex, designed for high-frequency team collaborat
 - Summarize recent messages from Feishu group chats
 - Search Feishu Docs and Wiki from Codex
 - Draft bot-style answers and send them back to Feishu
-- Push recurring Codex project digests into Feishu chats
+- Push Codex project digests into Feishu private assistant chats or group chats
 - Receive Feishu event subscription webhooks for passive bot triggers and message intake
 - Avoid unstable upstream beta token flows by using a local stable HTTP-backed MCP implementation
+
+## 5-Minute Private Assistant Push
+
+Use this path when you want Codex to draft a project update and push it to your Feishu private assistant chat.
+
+```bash
+git clone https://github.com/hunkwu/plugins-codex-feishu.git
+cd plugins-codex-feishu
+cp .env.example .env
+npm install
+```
+
+Edit `.env`:
+
+```env
+FEISHU_APP_ID=cli_xxx
+FEISHU_APP_SECRET=xxx
+FEISHU_DEFAULT_RECEIVE_ID=ou_xxxxx
+FEISHU_DEFAULT_RECEIVE_ID_TYPE=open_id
+```
+
+Verify credentials and preview the message first:
+
+```bash
+npm run feishu:doctor
+npm run feishu:project-update -- --preview --message "Codex project update preview."
+```
+
+Send a short test message before sending the full update:
+
+```bash
+npm run feishu:project-update -- --test --send
+npm run feishu:project-update -- --send --file ./digest.md
+```
+
+If configuration is missing, the script prints the exact missing items and setup steps. `FEISHU_APP_ID` identifies the sending app; `open_id` identifies the recipient user.
+
+## 5-Minute Message Bot Quickstart
+
+Use this path when you want to quickly verify Feishu message integration from this GitHub repository. It uses Feishu's official long connection mode, so you do not need a public HTTPS callback URL.
+
+```bash
+git clone https://github.com/hunkwu/plugins-codex-feishu.git
+cd plugins-codex-feishu
+cp .env.example .env
+npm install
+```
+
+Edit `.env`:
+
+```env
+FEISHU_APP_ID=cli_xxx
+FEISHU_APP_SECRET=xxx
+FEISHU_BOT_REPLY_TEXT=收到，我已接入 Codex Feishu 插件。
+```
+
+In Feishu Open Platform:
+
+1. Create a self-built app and copy `App ID` / `App Secret`.
+2. Go to `Events and Callbacks`.
+3. Select `Receive events through long connection`.
+4. Subscribe to `im.message.receive_v1`.
+5. Grant `im:message` and `im:message:send_as_bot`.
+6. Publish the app and add the bot to a test group.
+
+Verify:
+
+```bash
+npm run feishu:doctor
+npm run feishu:bot
+```
+
+When the terminal shows `ws client ready`, send a text message in the group. The bot should reply:
+
+```text
+收到，我已接入 Codex Feishu 插件。
+```
+
+Full guide: [Quickstart Message Bot](./plugins/feishu/skills/feishu/examples/quickstart-message-bot.md)
 
 ## Core scenarios
 
@@ -189,6 +268,7 @@ More details:
 
 - [Webhook event subscription](./plugins/feishu/skills/feishu/reference/webhook.md)
 - [Webhook to bot reply example](./plugins/feishu/skills/feishu/examples/webhook-to-reply.md)
+- [Platform roadmap](./docs/platform-roadmap.md)
 
 ## Private Assistant Push
 
@@ -210,6 +290,14 @@ If the private push is not configured yet, check and guide the user through:
 2. Run `plugins/feishu/scripts/doctor-feishu-auth.sh` to verify app credentials and tenant token access.
 3. Get the recipient user's `open_id`.
 4. Send a short test message before sending the full Codex project update.
+
+Recommended command path:
+
+```bash
+npm run feishu:project-update -- --preview --file ./digest.md
+npm run feishu:project-update -- --test --send
+npm run feishu:project-update -- --send --file ./digest.md
+```
 
 Recommended ways to get `open_id`:
 

@@ -29,6 +29,25 @@ data:
 useUAT: true
 ```
 
+## Docs/Wiki To Write-Back
+
+Use this when Codex needs to turn Feishu knowledge into a shareable result:
+
+1. Search Docs or Wiki.
+2. Read the selected content.
+3. Summarize or transform the content with Codex.
+4. Import the final Markdown with `docx_builtin_import`.
+5. Send the resulting document reference back to Feishu IM.
+
+See `examples/docs-wiki-to-doc.md`.
+
+Minimum permissions:
+
+- `docx:document` for Docs search/read workflows.
+- `wiki:wiki:readonly` for Wiki search/read workflows.
+- `docs:document:import` for write-back.
+- `drive:drive` if the tenant or target location requires Drive access.
+
 ## Notes
 
 - Prefer user token mode for documents the user should open directly.

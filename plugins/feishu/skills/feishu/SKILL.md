@@ -26,6 +26,7 @@ Use this skill when the user asks to operate Feishu, Feishu Docs, Wiki, groups, 
 - Contacts: `contact_v3_user_batchGetId`
 - Generic fallback: `feishu_openapi_request`
 - Webhook receiver: `scripts/feishu_webhook_server.py`
+- Private assistant push script: `scripts/feishu-project-update.js`
 
 The stable local MCP server currently wraps the core IM, Docs, Wiki, and Contacts flows directly. For Bitable, permissions, and other less-common endpoints, use `feishu_openapi_request` until a dedicated stable wrapper is added.
 
@@ -88,6 +89,9 @@ useUAT: true
 - Group summary: summarize recent group messages into decisions, action items, blockers, and owners.
 - Bot reply: search Docs or Wiki, compose an answer, and push it back to a target Feishu chat.
 - Codex project digest push: summarize project progress and push an update into a Feishu chat on a schedule.
+- Private assistant push: preview a Codex project update, send a short test message, then send the final update to a user's `open_id`.
+- Docs/Wiki write-back: search knowledge, summarize with Codex, and import the result into a Feishu Doc.
+- Bitable project operations: sync project status, risks, release records, and case study intake into Feishu Base/Bitable.
 - Webhook to bot reply: receive `im.message.receive_v1`, draft a reply with Codex, and send it back to the same chat.
 
 ## References
@@ -100,6 +104,9 @@ useUAT: true
 - Permissions: `reference/permissions.md`
 - Webhook event subscription: `reference/webhook.md`
 - Reusable workflows: `reference/workflows.md`
+- Project update push example: `examples/project-digest-push.md`
+- Docs/Wiki write-back example: `examples/docs-wiki-to-doc.md`
+- Bitable project templates: `examples/bitable-project-templates.md`
 
 ## Boundaries
 

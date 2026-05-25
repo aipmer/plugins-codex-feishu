@@ -29,14 +29,27 @@ require_file "${PLUGIN_DIR}/.codex-plugin/plugin.json"
 require_file "${PLUGIN_DIR}/.mcp.json"
 require_file "${PLUGIN_DIR}/skills/feishu/SKILL.md"
 require_file "${PLUGIN_DIR}/scripts/feishu_http_mcp.py"
+require_file "${PLUGIN_DIR}/scripts/feishu-long-connection-bot.js"
+require_file "${PLUGIN_DIR}/scripts/feishu-project-update.js"
 require_file "${PLUGIN_DIR}/scripts/feishu_webhook_server.py"
 require_file "${PLUGIN_DIR}/scripts/test-feishu-webhook.py"
+require_file "${PLUGIN_DIR}/skills/feishu/examples/quickstart-message-bot.md"
+require_file "${PLUGIN_DIR}/skills/feishu/examples/docs-wiki-to-doc.md"
+require_file "${PLUGIN_DIR}/skills/feishu/examples/bitable-project-templates.md"
 require_file "${PLUGIN_DIR}/testdata/webhook/url_verification.json"
 require_file "${PLUGIN_DIR}/testdata/webhook/message_receive_v1.json"
+require_file "${REPO_ROOT}/docs/platform-roadmap.md"
+require_file "${REPO_ROOT}/case-studies/2026-05-25-private-assistant-push.md"
+require_file "${REPO_ROOT}/case-studies/2026-05-25-message-bot-quickstart.md"
+require_file "${REPO_ROOT}/case-studies/2026-05-25-docs-wiki-writeback.md"
+require_file "${REPO_ROOT}/.env.example"
+require_file "${REPO_ROOT}/package.json"
 require_file "${REPO_ROOT}/scripts/check-sensitive-values.sh"
 require_executable "${PLUGIN_DIR}/scripts/generate-feishu-auth-url.sh"
 require_executable "${PLUGIN_DIR}/scripts/exchange-feishu-code.sh"
 require_executable "${PLUGIN_DIR}/scripts/doctor-feishu-auth.sh"
+require_executable "${PLUGIN_DIR}/scripts/feishu-long-connection-bot.js"
+require_executable "${PLUGIN_DIR}/scripts/feishu-project-update.js"
 require_executable "${PLUGIN_DIR}/scripts/feishu_http_mcp.py"
 require_executable "${PLUGIN_DIR}/scripts/feishu_webhook_server.py"
 require_executable "${PLUGIN_DIR}/scripts/test-feishu-webhook.py"
@@ -52,6 +65,7 @@ repo_root = pathlib.Path(sys.argv[1])
 plugin_dir = repo_root / "plugins" / "feishu"
 
 for relative in [
+    "package.json",
     "plugins/feishu/.codex-plugin/plugin.json",
     "plugins/feishu/.mcp.json",
     ".agents/plugins/marketplace.json",
@@ -145,6 +159,28 @@ webhook_fixture_check = subprocess.run(
 if webhook_fixture_check.returncode != 0:
     raise SystemExit(webhook_fixture_check.stderr or webhook_fixture_check.stdout)
 print(webhook_fixture_check.stdout.strip())
+
+long_connection_check = subprocess.run(
+    ["node", "-c", str(plugin_dir / "scripts" / "feishu-long-connection-bot.js")],
+    stdout=subprocess.PIPE,
+    stderr=subprocess.PIPE,
+    text=True,
+    check=False,
+)
+if long_connection_check.returncode != 0:
+    raise SystemExit(long_connection_check.stderr or long_connection_check.stdout)
+print("ok: long connection bot syntax check passed")
+
+project_update_check = subprocess.run(
+    ["node", "-c", str(plugin_dir / "scripts" / "feishu-project-update.js")],
+    stdout=subprocess.PIPE,
+    stderr=subprocess.PIPE,
+    text=True,
+    check=False,
+)
+if project_update_check.returncode != 0:
+    raise SystemExit(project_update_check.stderr or project_update_check.stdout)
+print("ok: project update push syntax check passed")
 PY
 
 "${REPO_ROOT}/scripts/check-sensitive-values.sh"

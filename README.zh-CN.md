@@ -23,9 +23,88 @@
 - 总结飞书群聊最近消息
 - 在 Codex 里搜索飞书文档和知识库
 - 生成机器人式回复并回推到飞书
-- 将 Codex 项目日报、周报推送到飞书群
+- 将 Codex 项目日报、周报推送到飞书私人助理或群聊
 - 接收飞书事件订阅 Webhook，用于机器人被动触发和群消息入口
 - 用本地稳定 HTTP MCP 实现，绕开上游 beta token 链路不稳定的问题
+
+## 5 分钟私人助理推送
+
+如果你希望让 Codex 生成项目更新，并推送到自己的飞书私人助理私聊，优先走这条路径。
+
+```bash
+git clone https://github.com/hunkwu/plugins-codex-feishu.git
+cd plugins-codex-feishu
+cp .env.example .env
+npm install
+```
+
+编辑 `.env`：
+
+```env
+FEISHU_APP_ID=cli_xxx
+FEISHU_APP_SECRET=xxx
+FEISHU_DEFAULT_RECEIVE_ID=ou_xxxxx
+FEISHU_DEFAULT_RECEIVE_ID_TYPE=open_id
+```
+
+先验证凭证，并预览消息：
+
+```bash
+npm run feishu:doctor
+npm run feishu:project-update -- --preview --message "Codex project update preview."
+```
+
+正式发送前，先发一条短测试消息：
+
+```bash
+npm run feishu:project-update -- --test --send
+npm run feishu:project-update -- --send --file ./digest.md
+```
+
+如果配置缺失，脚本会输出缺少的项目和下一步设置指引。`FEISHU_APP_ID` 是发送消息的应用身份；`open_id` 是接收消息的用户身份。
+
+## 5 分钟消息机器人快速接入
+
+如果你希望从这个 GitHub 仓库快速验证飞书消息对接，优先走这条路径。它使用飞书官方长连接模式，不需要公网 HTTPS 回调地址。
+
+```bash
+git clone https://github.com/hunkwu/plugins-codex-feishu.git
+cd plugins-codex-feishu
+cp .env.example .env
+npm install
+```
+
+编辑 `.env`：
+
+```env
+FEISHU_APP_ID=cli_xxx
+FEISHU_APP_SECRET=xxx
+FEISHU_BOT_REPLY_TEXT=收到，我已接入 Codex Feishu 插件。
+```
+
+在飞书开放平台中：
+
+1. 创建企业自建应用，并复制 `App ID` / `App Secret`。
+2. 进入「事件与回调」。
+3. 订阅方式选择「使用长连接接收事件」。
+4. 订阅 `im.message.receive_v1`。
+5. 开通 `im:message` 和 `im:message:send_as_bot`。
+6. 发布应用，并把机器人加入测试群。
+
+验证：
+
+```bash
+npm run feishu:doctor
+npm run feishu:bot
+```
+
+终端出现 `ws client ready` 后，在群里发一条文本消息。机器人应回复：
+
+```text
+收到，我已接入 Codex Feishu 插件。
+```
+
+完整指引：[Quickstart Message Bot](./plugins/feishu/skills/feishu/examples/quickstart-message-bot.md)
 
 ## 核心场景
 
@@ -189,6 +268,7 @@ https://your-public-domain.example/webhook/feishu
 
 - [Webhook 事件订阅](./plugins/feishu/skills/feishu/reference/webhook.md)
 - [Webhook 到机器人回复示例](./plugins/feishu/skills/feishu/examples/webhook-to-reply.md)
+- [平台路线说明](./docs/platform-roadmap.md)
 
 ## 私人助理推送
 
@@ -210,6 +290,14 @@ Draft a Codex project update and send it to Feishu.
 2. 运行 `plugins/feishu/scripts/doctor-feishu-auth.sh` 验证应用凭证和 tenant token。
 3. 获取接收人的 `open_id`。
 4. 先发送一条短测试消息，再发送完整 Codex 项目更新。
+
+推荐命令路径：
+
+```bash
+npm run feishu:project-update -- --preview --file ./digest.md
+npm run feishu:project-update -- --test --send
+npm run feishu:project-update -- --send --file ./digest.md
+```
 
 获取 `open_id` 的推荐方式：
 

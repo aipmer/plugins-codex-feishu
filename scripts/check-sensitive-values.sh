@@ -13,7 +13,14 @@ patterns=(
 )
 
 for pattern in "${patterns[@]}"; do
-  if rg -n --hidden --glob '!**/.git/**' --glob '!**/node_modules/**' --glob '!tmp/**' "${pattern}" "${REPO_ROOT}" >/tmp/feishu-sensitive-scan.txt; then
+  if rg -n --hidden \
+    --glob '!**/.git/**' \
+    --glob '!**/node_modules/**' \
+    --glob '!tmp/**' \
+    --glob '!**/.env' \
+    --glob '!**/.env.local' \
+    --glob '!**/.env.*.local' \
+    "${pattern}" "${REPO_ROOT}" >/tmp/feishu-sensitive-scan.txt; then
     echo "fail: potential real Feishu identifier or secret found for pattern: ${pattern}" >&2
     cat /tmp/feishu-sensitive-scan.txt >&2
     exit 1
