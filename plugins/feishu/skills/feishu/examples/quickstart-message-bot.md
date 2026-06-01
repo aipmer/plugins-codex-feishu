@@ -13,7 +13,7 @@ Run a local long-connection Feishu bot that replies to group text messages:
 ## 1. Clone And Install
 
 ```bash
-git clone https://github.com/hunkwu/plugins-codex-feishu.git
+git clone https://github.com/aipmer/plugins-codex-feishu.git
 cd plugins-codex-feishu
 cp .env.example .env
 npm install
@@ -119,7 +119,7 @@ The quickstart bot is intentionally simple. Use it to verify message integration
 ### 1. 克隆并安装
 
 ```bash
-git clone https://github.com/hunkwu/plugins-codex-feishu.git
+git clone https://github.com/aipmer/plugins-codex-feishu.git
 cd plugins-codex-feishu
 cp .env.example .env
 npm install

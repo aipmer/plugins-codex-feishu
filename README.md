@@ -32,7 +32,7 @@ Open-source Feishu plugin for Codex, designed for high-frequency team collaborat
 Use this path when you want Codex to draft a project update and push it to your Feishu private assistant chat.
 
 ```bash
-git clone https://github.com/hunkwu/plugins-codex-feishu.git
+git clone https://github.com/aipmer/plugins-codex-feishu.git
 cd plugins-codex-feishu
 cp .env.example .env
 npm install
@@ -76,7 +76,7 @@ If configuration is missing, the script prints the exact missing items and setup
 Use this path when you want to quickly verify Feishu message integration from this GitHub repository. It uses Feishu's official long connection mode, so you do not need a public HTTPS callback URL.
 
 ```bash
-git clone https://github.com/hunkwu/plugins-codex-feishu.git
+git clone https://github.com/aipmer/plugins-codex-feishu.git
 cd plugins-codex-feishu
 cp .env.example .env
 npm install
@@ -158,7 +158,7 @@ For regular users, the recommended path is to add this GitHub repository directl
 
 In `Add Plugin Marketplace`:
 
-- Source: `https://github.com/hunkwu/plugins-codex-feishu.git`
+- Source: `https://github.com/aipmer/plugins-codex-feishu.git`
 - Git reference: `main`
 - Sparse path: `plugins/feishu`
 
@@ -181,7 +181,7 @@ Most users only need the `Codex Community` install. You do not need to install a
 If you want to contribute code, debug scripts, or modify the plugin, clone the repository:
 
 ```bash
-git clone https://github.com/hunkwu/plugins-codex-feishu.git
+git clone https://github.com/aipmer/plugins-codex-feishu.git
 cd plugins-codex-feishu
 scripts/smoke-test.sh
 ```

@@ -7,7 +7,7 @@
     "url": "https://pmer.cn"
   },
   "homepage": "https://pmer.cn",
-  "repository": "https://github.com/hunkwu/plugins-codex-feishu",
+  "repository": "https://github.com/aipmer/plugins-codex-feishu",
   "license": "Apache-2.0",
   "keywords": [
     "feishu",

@@ -32,7 +32,7 @@
 如果你希望让 Codex 生成项目更新，并推送到自己的飞书私人助理私聊，优先走这条路径。
 
 ```bash
-git clone https://github.com/hunkwu/plugins-codex-feishu.git
+git clone https://github.com/aipmer/plugins-codex-feishu.git
 cd plugins-codex-feishu
 cp .env.example .env
 npm install
@@ -76,7 +76,7 @@ npm run feishu:project-update -- --preview --receive-id ou_xxxxx --receive-id-ty
 如果你希望从这个 GitHub 仓库快速验证飞书消息对接，优先走这条路径。它使用飞书官方长连接模式，不需要公网 HTTPS 回调地址。
 
 ```bash
-git clone https://github.com/hunkwu/plugins-codex-feishu.git
+git clone https://github.com/aipmer/plugins-codex-feishu.git
 cd plugins-codex-feishu
 cp .env.example .env
 npm install
@@ -158,7 +158,7 @@ plugins/feishu/
 
 在 `Add Plugin Marketplace` 中填写：
 
-- Source：`https://github.com/hunkwu/plugins-codex-feishu.git`
+- Source：`https://github.com/aipmer/plugins-codex-feishu.git`
 - Git reference：`main`
 - Sparse path：`plugins/feishu`
 
@@ -181,7 +181,7 @@ plugins/feishu/
 如果你要贡献代码、调试脚本或修改插件，可以先克隆仓库：
 
 ```bash
-git clone https://github.com/hunkwu/plugins-codex-feishu.git
+git clone https://github.com/aipmer/plugins-codex-feishu.git
 cd plugins-codex-feishu
 scripts/smoke-test.sh
 ```
