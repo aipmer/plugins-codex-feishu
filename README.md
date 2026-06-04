@@ -96,7 +96,7 @@ FEISHU_CODEX_COMMAND_MODE=stdin
 FEISHU_RUNNER_COMMAND="codex exec"
 ```
 
-If you only want a connectivity check, `FEISHU_BOT_REPLY_TEXT` is enough. To enable the current minimal bridge flow, also set `FEISHU_CODEX_COMMAND` so incoming text messages can trigger a local command. The current command set is: `/help`, `/new`, `/status`, `/stop`, `/cd <path>`.
+If you only want a connectivity check, `FEISHU_BOT_REPLY_TEXT` is enough. To enable the current minimal bridge flow, also set `FEISHU_CODEX_COMMAND` so incoming text messages can trigger a local command. The current command set is: `/help`, `/new`, `/status`, `/ids`, `/stop`, `/cd <path>`.
 
 Local execution protocol:
 
@@ -162,6 +162,8 @@ After that works, switch `FEISHU_RUNNER_COMMAND` back to the real command, for e
 
 The bot stores a short recent-message history per session and ignores duplicate Feishu `message_id` deliveries, so retry delivery from Feishu does not create duplicate local executions or duplicate replies.
 
+`/status` now includes the current `chat_id`, sender `open_id`, bridge command, runner command, and local service summary when available. `/ids` prints the current session identifiers together with allowlist-ready `FEISHU_BOT_ALLOWED_CHATS` and `FEISHU_BOT_ALLOWED_USERS` snippets.
+
 Unified CLI entry:
 
 - `npm run feishu -- doctor`
@@ -171,7 +173,7 @@ Unified CLI entry:
 - `npm run feishu -- restart`
 - `npm run feishu -- status`
 - `npm run feishu -- runner --print-payload`
-- `npm run feishu -- push --preview --message "Completed: shipped docs."`
+- `npm run feishu -- push --preview --message "已完成：发布文档"`
 - `npm run feishu -- webhook --self-test`
 
 Local service management:
@@ -377,7 +379,7 @@ Recommended command path:
 
 ```bash
 npm run feishu:project-update -- --preview --mode weekly --file ./plugins/feishu/skills/feishu/examples/project-update-template.md
-npm run feishu:project-update -- --dry-run-json --mode daily --message "Completed: shipped docs."
+npm run feishu:project-update -- --dry-run-json --mode daily --message "已完成：发布文档"
 npm run feishu:project-update -- --test --send --confirm
 npm run feishu:project-update -- --send --confirm --title "Weekly Update" --file ./digest.md
 ```

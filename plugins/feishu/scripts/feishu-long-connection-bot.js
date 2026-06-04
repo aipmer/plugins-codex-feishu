@@ -19,6 +19,7 @@ const HELP_TEXT = [
   '/help - show available commands',
   '/new - reset current session state',
   '/status - show workspace and run status',
+  '/ids - show current chat and sender identifiers',
   '/stop - stop the current local task',
   '/cd <path> - change workspace for this session',
 ].join('\n');
@@ -129,7 +130,7 @@ function authorizeMessage(data, config = getAccessControlConfig()) {
   return { allowed: false, reason: 'not_allowed' };
 }
 
-function buildAccessDeniedMessage(config = getAccessControlConfig()) {
+function buildAccessDeniedMessage(config = getAccessControlConfig(), context = {}) {
   if (!isAccessControlled(config)) {
     return 'Access control is not configured.';
   }
@@ -140,7 +141,22 @@ function buildAccessDeniedMessage(config = getAccessControlConfig()) {
   if (config.allowedUsers.size) enabled.push('allowed users');
   if (config.allowedChats.size) enabled.push('allowed chats');
 
-  return `Access denied for this message. Active policy: ${enabled.join(', ')}.`;
+  const lines = [
+    `Access denied for this message. Active policy: ${enabled.join(', ')}.`,
+  ];
+  if (context.chatId) {
+    lines.push(`Current chat_id: ${context.chatId}`);
+  }
+  if (context.senderOpenId) {
+    lines.push(`Current sender open_id: ${context.senderOpenId}`);
+  }
+  if (context.chatId) {
+    lines.push(`Allow this chat: FEISHU_BOT_ALLOWED_CHATS="${context.chatId}"`);
+  }
+  if (context.senderOpenId) {
+    lines.push(`Allow this user: FEISHU_BOT_ALLOWED_USERS="${context.senderOpenId}"`);
+  }
+  return lines.join('\n');
 }
 
 function shouldHandleMessage(data) {
@@ -167,7 +183,7 @@ function parseCommand(text) {
   const name = (firstSpace === -1 ? trimmed.slice(1) : trimmed.slice(1, firstSpace)).trim().toLowerCase();
   const argText = firstSpace === -1 ? '' : trimmed.slice(firstSpace + 1).trim();
 
-  if (!['help', 'new', 'status', 'stop', 'cd'].includes(name)) {
+  if (!['help', 'new', 'status', 'ids', 'stop', 'cd'].includes(name)) {
     return { name: 'unknown', argText, raw: trimmed };
   }
 
@@ -241,9 +257,32 @@ function resetSession(sessionKey, stateDir = getStateDir()) {
   return saveSession(nextSession, stateDir);
 }
 
-function formatStatus(session, hasRunningProcess) {
-  const running = session.running && hasRunningProcess;
+function getServiceStatusSummary() {
+  try {
+    const service = require(path.join(__dirname, '..', '..', '..', 'scripts', 'feishu-service.js'));
+    return service.getServiceStatus();
+  } catch (error) {
+    return null;
+  }
+}
+
+function buildIdsReply(context = {}) {
   return [
+    `Session: ${context.sessionKey || 'unknown'}`,
+    `Chat ID: ${context.chatId || 'unknown'}`,
+    `Sender Open ID: ${context.senderOpenId || 'unknown'}`,
+    '',
+    'Whitelist examples:',
+    `FEISHU_BOT_ALLOWED_CHATS="${context.chatId || 'oc_xxxxx'}"`,
+    `FEISHU_BOT_ALLOWED_USERS="${context.senderOpenId || 'ou_xxxxx'}"`,
+  ].join('\n');
+}
+
+function formatStatus(session, hasRunningProcess, context = {}) {
+  const running = session.running && hasRunningProcess;
+  const serviceStatus = context.serviceStatus || null;
+  const runnerCommand = context.runnerCommand || process.env.FEISHU_RUNNER_COMMAND || '';
+  const lines = [
     `Session: ${session.sessionKey}`,
     `Workspace: ${session.workspace}`,
     `Running: ${running ? 'yes' : 'no'}`,
@@ -251,8 +290,23 @@ function formatStatus(session, hasRunningProcess) {
     `Queued: ${Array.isArray(session.queuedMessages) ? session.queuedMessages.length : 0}`,
     `Current PID: ${session.currentPid || 'none'}`,
     `Last command: ${session.lastCommand || 'none'}`,
-    `Last updated: ${session.updatedAt || 'unknown'}`,
-  ].join('\n');
+  ];
+  if (context.chatId) {
+    lines.push(`Chat ID: ${context.chatId}`);
+  }
+  if (context.senderOpenId) {
+    lines.push(`Sender Open ID: ${context.senderOpenId}`);
+  }
+  lines.push(`Command mode: ${getExecutionMode()}`);
+  lines.push(`Bridge command: ${getExecutionCommand() || 'unconfigured'}`);
+  lines.push(`Runner command: ${runnerCommand || 'default codex exec'}`);
+  if (serviceStatus) {
+    lines.push(`Service loaded: ${serviceStatus.loaded ? 'yes' : 'no'}`);
+    lines.push(`Service state: ${serviceStatus.launchctlState || 'unknown'}`);
+    lines.push(`Service PID: ${serviceStatus.pid || 'none'}`);
+  }
+  lines.push(`Last updated: ${session.updatedAt || 'unknown'}`);
+  return lines.join('\n');
 }
 
 function normalizeRecentMessageIds(value) {
@@ -722,7 +776,7 @@ class SessionRuntime {
   }
 }
 
-async function handleCommand(command, session, runtime) {
+async function handleCommand(command, session, runtime, context = {}) {
   if (command.name === 'help' || command.name === 'unknown') {
     if (command.name === 'unknown') {
       return `${HELP_TEXT}\n\nUnknown command: ${command.raw}`;
@@ -740,7 +794,18 @@ async function handleCommand(command, session, runtime) {
 
   if (command.name === 'status') {
     const latest = loadActiveSession(session.sessionKey, runtime);
-    return formatStatus(latest, runtime.hasRunning(session.sessionKey));
+    return formatStatus(latest, runtime.hasRunning(session.sessionKey), {
+      ...context,
+      serviceStatus: getServiceStatusSummary(),
+      runnerCommand: process.env.FEISHU_RUNNER_COMMAND || '',
+    });
+  }
+
+  if (command.name === 'ids') {
+    return buildIdsReply({
+      ...context,
+      sessionKey: session.sessionKey,
+    });
   }
 
   if (command.name === 'stop') {
@@ -769,7 +834,11 @@ async function handleCommand(command, session, runtime) {
       lastCommand: command.raw,
       lastError: '',
     });
-    return `Workspace updated.\n${formatStatus(nextSession, runtime.hasRunning(session.sessionKey))}`;
+    return `Workspace updated.\n${formatStatus(nextSession, runtime.hasRunning(session.sessionKey), {
+      ...context,
+      serviceStatus: getServiceStatusSummary(),
+      runnerCommand: process.env.FEISHU_RUNNER_COMMAND || '',
+    })}`;
   }
 
   return HELP_TEXT;
@@ -781,10 +850,14 @@ async function handleTextMessage(client, data, runtime) {
   }
 
   const message = getMessage(data);
+  const senderOpenId = getSenderOpenId(data);
   const accessConfig = getAccessControlConfig();
   const authorization = authorizeMessage(data, accessConfig);
   if (!authorization.allowed) {
-    const replyMessageId = await sendTextReply(client, message.chat_id, buildAccessDeniedMessage(accessConfig));
+    const replyMessageId = await sendTextReply(client, message.chat_id, buildAccessDeniedMessage(accessConfig, {
+      chatId: message.chat_id || '',
+      senderOpenId,
+    }));
     return {
       event_type: 'im.message.receive_v1',
       chat_id: message.chat_id,
@@ -814,7 +887,10 @@ async function handleTextMessage(client, data, runtime) {
   const command = parseCommand(text);
 
   if (command) {
-    const reply = await handleCommand(command, session, runtime);
+    const reply = await handleCommand(command, session, runtime, {
+      chatId: message.chat_id || '',
+      senderOpenId,
+    });
     const replyMessageId = await sendTextReply(client, message.chat_id, reply);
     return {
       event_type: 'im.message.receive_v1',
@@ -831,7 +907,12 @@ async function handleTextMessage(client, data, runtime) {
     const replyMessageId = await sendTextReply(
       client,
       message.chat_id,
-      `A local task is already running for this session. Your message has been queued.\n${formatStatus(queuedSession, true)}`
+      `A local task is already running for this session. Your message has been queued.\n${formatStatus(queuedSession, true, {
+        chatId: message.chat_id || '',
+        senderOpenId,
+        serviceStatus: getServiceStatusSummary(),
+        runnerCommand: process.env.FEISHU_RUNNER_COMMAND || '',
+      })}`
     );
     return {
       event_type: 'im.message.receive_v1',
@@ -914,6 +995,7 @@ module.exports = {
   formatStatus,
   getSessionFilePath,
   hasProcessedMessage,
+  handleCommand,
   handleTextMessage,
   loadActiveSession,
   loadSession,

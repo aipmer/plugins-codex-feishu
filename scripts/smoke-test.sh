@@ -214,6 +214,11 @@ if (!help || help.name != 'help') {
   throw new Error('expected /help command parsing');
 }
 
+const ids = bot.parseCommand('/ids');
+if (!ids || ids.name != 'ids') {
+  throw new Error('expected /ids command parsing');
+}
+
 const cd = bot.parseCommand('/cd ./plugins');
 if (!cd || cd.name != 'cd' || cd.argText != './plugins') {
   throw new Error('expected /cd command parsing');
@@ -241,8 +246,17 @@ if (reset.lastCommand !== '' || reset.workspace !== process.cwd()) {
   throw new Error('session reset check failed');
 }
 
-if (!bot.formatStatus(saved, false).includes('Workspace:')) {
+const formattedStatus = bot.formatStatus(saved, false, {
+  chatId: 'oc_test_chat',
+  senderOpenId: 'ou_test_sender',
+  runnerCommand: 'codex exec',
+  serviceStatus: { loaded: true, launchctlState: 'running', pid: '12345' },
+});
+if (!formattedStatus.includes('Workspace:')) {
   throw new Error('status formatting check failed');
+}
+if (!formattedStatus.includes('Runner command: codex exec') || !formattedStatus.includes('Service loaded: yes')) {
+  throw new Error(`status summary missing runner/service details: ${formattedStatus}`);
 }
 
 const deduped = bot.markMessageProcessed(saved, 'om_first');
@@ -491,9 +505,15 @@ const deniedMessage = bot.buildAccessDeniedMessage({
   admins: new Set(['ou_admin']),
   allowedUsers: new Set(['ou_allowed']),
   allowedChats: new Set(['oc_acl_test']),
+}, {
+  chatId: 'oc_acl_test',
+  senderOpenId: 'ou_blocked_user',
 });
-if (!deniedMessage.includes('owner') || !deniedMessage.includes('allowed chats')) {
+if (!deniedMessage.includes('owner') || !deniedMessage.includes('allowed chats') || !deniedMessage.includes('Current chat_id: oc_acl_test')) {
   throw new Error(`unexpected denied message: ${deniedMessage}`);
+}
+if (!deniedMessage.includes('FEISHU_BOT_ALLOWED_USERS="ou_blocked_user"')) {
+  throw new Error(`denied message should include allowlist hint: ${deniedMessage}`);
 }
 
 console.log('ok: access control checks passed');
@@ -705,11 +725,21 @@ const client = {
   if (queueNotice2.length !== 2 || !queueNotice2.some((item) => item.includes('Queued: 2'))) {
     throw new Error(`expected two queue notices with growing count: ${JSON.stringify(replies)}`);
   }
+  if (!queueNotice.includes('Runner command: node plugins/feishu/scripts/feishu-codex-echo.js')) {
+    throw new Error(`queue notice missing runner command: ${JSON.stringify(replies)}`);
+  }
   if (!queuedReply || !queuedReply.includes('Message: 第二条排队消息')) {
     throw new Error(`queued reply missing second message text: ${JSON.stringify(replies)}`);
   }
   if (queuedReply2.length !== 2 || !queuedReply2.some((item) => item.includes('Message: 第三条排队消息'))) {
     throw new Error(`expected second queued reply: ${JSON.stringify(replies)}`);
+  }
+  const idsReply = await bot.handleCommand({ name: 'ids', argText: '', raw: '/ids' }, bot.loadSession('chat:oc_test_chat'), runtime, {
+    chatId: 'oc_test_chat',
+    senderOpenId: 'ou_test_sender',
+  });
+  if (!idsReply.includes('Chat ID: oc_test_chat') || !idsReply.includes('Sender Open ID: ou_test_sender')) {
+    throw new Error(`unexpected ids reply: ${idsReply}`);
   }
   console.log('ok: bot bridge end-to-end local check passed');
 })().catch((error) => {

@@ -5,9 +5,20 @@ const fs = require('fs');
 const path = require('path');
 const Lark = require('@larksuiteoapi/node-sdk');
 
-const DEFAULT_TEST_TEXT = 'Codex Feishu private assistant test message.';
+const DEFAULT_TEST_TEXT = 'Codex 飞书私人助理测试消息。';
 const VALID_MODES = new Set(['daily', 'weekly', 'custom']);
 const VALID_RECEIVE_ID_TYPES = new Set(['open_id', 'chat_id']);
+const SECTION_ALIASES = new Map([
+  ['Completed', '已完成'],
+  ['In Progress', '进行中'],
+  ['Risks', '风险阻塞'],
+  ['Next Steps', '下一步'],
+  ['已完成', '已完成'],
+  ['进行中', '进行中'],
+  ['风险阻塞', '风险阻塞'],
+  ['下一步', '下一步'],
+]);
+const SECTION_ORDER = ['已完成', '进行中', '风险阻塞', '下一步'];
 
 function parseArgs(argv) {
   const options = {
@@ -61,9 +72,9 @@ function parseArgs(argv) {
 function usage() {
   return `Usage:
   npm run feishu:project-update -- --preview --mode daily --file ./plugins/feishu/skills/feishu/examples/project-update-template.md
-  npm run feishu:project-update -- --dry-run-json --mode weekly --message "Project update"
+  npm run feishu:project-update -- --dry-run-json --mode weekly --message "已完成: 发布文档"
   npm run feishu:project-update -- --test --send --confirm
-  npm run feishu:project-update -- --send --confirm --title "Weekly Update" --file ./digest.md
+  npm run feishu:project-update -- --send --confirm --title "Codex 周报" --file ./digest.md
 
 Options:
   --preview                 Render a local preview. Default when --confirm is absent.
@@ -99,15 +110,14 @@ function readBody(options) {
 }
 
 function defaultTitleForMode(mode) {
-  if (mode === 'daily') return 'Codex Daily Update';
-  if (mode === 'weekly') return 'Codex Weekly Update';
-  return 'Codex Project Update';
+  if (mode === 'daily') return 'Codex 日报';
+  if (mode === 'weekly') return 'Codex 周报';
+  return 'Codex 项目更新';
 }
 
 function normalizeSections(body) {
-  const labels = ['Completed', 'In Progress', 'Risks', 'Next Steps'];
-  const sections = new Map(labels.map((label) => [label, []]));
-  let current = 'Completed';
+  const sections = new Map(SECTION_ORDER.map((label) => [label, []]));
+  let current = '已完成';
 
   for (const rawLine of body.split('\n')) {
     const line = rawLine.trim();
@@ -115,7 +125,10 @@ function normalizeSections(body) {
       continue;
     }
 
-    const matchedLabel = labels.find((label) => line.toLowerCase() === `${label.toLowerCase()}:`);
+    const normalizedHeader = line.endsWith(':') || line.endsWith('：')
+      ? line.slice(0, -1).trim()
+      : '';
+    const matchedLabel = normalizedHeader ? SECTION_ALIASES.get(normalizedHeader) : '';
     if (matchedLabel) {
       current = matchedLabel;
       continue;
@@ -133,7 +146,7 @@ function normalizeSections(body) {
 }
 
 function renderSection(label, items) {
-  const lines = items.length ? items.map((item) => `- ${item}`) : ['- None'];
+  const lines = items.length ? items.map((item) => `- ${item}`) : ['- 无'];
   return `${label}:\n${lines.join('\n')}`;
 }
 
@@ -147,13 +160,13 @@ function buildRenderedMessage(options, body) {
   return [
     title,
     '',
-    renderSection('Completed', sections.get('Completed')),
+    renderSection('已完成', sections.get('已完成')),
     '',
-    renderSection('In Progress', sections.get('In Progress')),
+    renderSection('进行中', sections.get('进行中')),
     '',
-    renderSection('Risks', sections.get('Risks')),
+    renderSection('风险阻塞', sections.get('风险阻塞')),
     '',
-    renderSection('Next Steps', sections.get('Next Steps')),
+    renderSection('下一步', sections.get('下一步')),
   ].join('\n');
 }
 
