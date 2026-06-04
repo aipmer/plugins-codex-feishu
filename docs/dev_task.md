@@ -21,6 +21,15 @@
   - `npm run feishu -- digest --preview`
   - `npm run feishu -- digest --send --confirm`
 - 完成默认日报模板中文化，并做了真实飞书推送验证。
+- 完成 GitHub 开源文档收口：
+  - README 内容结构优化，降低首屏图片占用，突出亮点和快速接入。
+  - README、CONTRIBUTING 统一为中文优先，保留必要英文摘要。
+  - CHANGELOG 统一以 `1.0.0` 作为首个公开版本。
+  - package、插件清单、MCP / Webhook 可见版本同步到 `1.0.0`。
+  - 删除独立 release note 和 case study 目录后，将必要信息收口到 CHANGELOG 与 dev task。
+- 完成公开文档规则收口：
+  - README / CHANGELOG / release notes 只记录用户可感知能力、行为变化、修复、兼容说明和验证证据。
+  - 不把不影响用户使用的维护动作写入公开更新日志。
 
 ### 今日遇到的问题
 
@@ -39,6 +48,15 @@
 5. 默认日报模板内容中文不完整
    原因：结构标题已经中文化，但模板正文仍保留英文示例条目。
 
+6. README 首屏信息过散
+   原因：截图和背景说明占用过多篇幅，用户进入仓库后不容易快速理解「能做什么」和「如何接入」。
+
+7. 公开更新日志混入维护动作
+   原因：发布收口时把内部文档整理、版本策略说明等内容也写进 CHANGELOG，容易干扰用户判断真实能力变化。
+
+8. 中英文文档维护成本偏高
+   原因：完整双语 README 和独立 release note 容易造成重复维护、信息漂移和过期链接。
+
 ### 解决方案
 
 1. 更换本地 `.env` 中的 Feishu 应用配置，并重新做长连接联调。
@@ -46,6 +64,10 @@
 3. 用统一 CLI、`launchd status`、runner 日志和真实飞书回包来拆分验证层次。
 4. 放弃完整 `schedule` 子系统，改为轻量 `digest` 包装脚本，加仓库外 `launchd` 示例。
 5. 把默认 `project-update-template.md` 完整改成中文，确保 `digest` 默认输出适合真实私聊推送。
+6. 重写 README 首屏结构，优先展示项目定位、核心能力、5 分钟接入和真实功能边界。
+7. 将 CONTRIBUTING 改为中文优先、英文补充，降低中文用户贡献门槛。
+8. 将 CHANGELOG 改为只保留公开用户可见变化，移除不影响用户的维护动作说明。
+9. 将文档结构收口为 README、CHANGELOG、roadmap、pre-release checklist 和 dev task，减少重复来源。
 
 ### 验证结果
 
@@ -53,14 +75,22 @@
 - `scripts/check-sensitive-values.sh` 通过
 - `npm run feishu -- digest --preview` 通过
 - `npm run feishu -- digest --send --confirm` 已真实成功
+- `npm run feishu -- help` 通过
+- README 本地链接与已删除目录引用检查通过
 - 相关 GitHub 提交：
   - `c8386e0`
   - `932ce18`
   - `9a5511d`
   - `d98bd85`
+  - `05d159b`
+  - `c90e853`
+  - `2d479ef`
 
-### 后续待办
+### 明日计划
 
 - 继续收紧访问控制默认值，降低误触发本地执行风险。
 - 评估是否需要把日报内容源从固定模板升级为半自动摘要。
-- 继续积累已打码截图、真实回包和案例，补强开源项目对外证据链。
+- 继续积累已打码截图和真实验证材料，补强开源项目对外证据链。
+- 检查 GitHub 首页展示效果，确认 README 首屏、目录和截图在网页端阅读顺畅。
+- 做一次从零安装路径复核，重点验证 `.env.example`、权限说明、`doctor` 和 `help` 是否足够引导新用户。
+- 梳理下一阶段 `v1.1.0` 的最小增量，优先考虑会话连续性、工作区绑定和更稳定的真实 `codex exec` 对接。
