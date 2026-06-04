@@ -1,15 +1,15 @@
 已完成:
-- Shipped the private assistant push workflow preview.
-- Updated the installation and troubleshooting docs.
+- 完成私人助理推送链路的预览与验证。
+- 更新安装说明和排障文档。
 
 进行中:
-- Refining Docs and Wiki write-back examples.
-- Preparing Bitable project operation templates.
+- 持续完善 Docs / Wiki 回写示例。
+- 整理 Bitable 项目操作模板。
 
 风险阻塞:
-- Tenant permissions may block write-back or message delivery.
-- Some users may confuse App ID with open_id during setup.
+- 租户权限配置可能影响回写或消息发送。
+- 初次配置时，用户容易混淆 App ID 和 open_id。
 
 下一步:
-- Run a short send test in Feishu private chat.
-- Turn one internal workflow into a public case study.
+- 在飞书私人助理私聊中完成一次真实发送测试。
+- 选择一个内部工作流整理为对外案例。
