@@ -16,6 +16,7 @@ for pattern in "${patterns[@]}"; do
   if rg -n --hidden \
     --glob '!**/.git/**' \
     --glob '!**/node_modules/**' \
+    --glob '!**/.tmp/**' \
     --glob '!tmp/**' \
     --glob '!**/.env' \
     --glob '!**/.env.local' \

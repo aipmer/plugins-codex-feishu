@@ -19,6 +19,7 @@ This directory collects practical case studies, especially stories about:
 - [Private Assistant Push For Codex Project Updates](./2026-05-25-private-assistant-push.md)
 - [Long-Connection Message Bot Quickstart](./2026-05-25-message-bot-quickstart.md)
 - [Docs/Wiki Retrieval And Write-Back](./2026-05-25-docs-wiki-writeback.md)
+- [Feishu Group -> Codex Execution -> Reply](./2026-06-04-feishu-group-codex-execution-reply.md)
 
 ## How To Submit
 
@@ -69,6 +70,7 @@ The goal is not to make every story look successful. Honest postmortems are valu
 - [Codex 项目更新的私人助理推送](./2026-05-25-private-assistant-push.md)
 - [长连接消息机器人快速接入](./2026-05-25-message-bot-quickstart.md)
 - [Docs/Wiki 检索与写回](./2026-05-25-docs-wiki-writeback.md)
+- [飞书群消息触发 Codex 执行并回写结果](./2026-06-04-feishu-group-codex-execution-reply.md)
 
 ## 如何投稿
 

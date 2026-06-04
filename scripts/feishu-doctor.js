@@ -3,8 +3,11 @@ require('dotenv').config({ quiet: true });
 
 const { spawnSync } = require('child_process');
 const path = require('path');
+const { getServiceConfig, printServiceEnvironmentCheck } = require('./feishu-service');
 
 const scriptPath = path.join(__dirname, '..', 'plugins', 'feishu', 'scripts', 'doctor-feishu-auth.sh');
+printServiceEnvironmentCheck(getServiceConfig());
+console.log('');
 const result = spawnSync(scriptPath, {
   stdio: 'inherit',
   env: process.env,

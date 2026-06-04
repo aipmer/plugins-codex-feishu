@@ -1,6 +1,6 @@
 {
   "name": "feishu",
-  "version": "0.1.1",
+  "version": "0.3.0-beta",
   "description": "Open-source Feishu plugin for Codex with stable IM, Docs, Wiki, and team workflow capabilities.",
   "author": {
     "name": "Hunk Wu",

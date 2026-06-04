@@ -1,6 +1,6 @@
 # Feishu for Codex
 
-Open-source Feishu plugin for Codex, designed for high-frequency team collaboration workflows.
+Open-source Feishu plugin for Codex, designed for high-frequency team collaboration workflows rather than as a chat substitute for Codex mobile.
 
 [中文说明](./README.zh-CN.md)
 
@@ -26,6 +26,8 @@ Open-source Feishu plugin for Codex, designed for high-frequency team collaborat
 - Push Codex project digests into Feishu private assistant chats or group chats
 - Receive Feishu event subscription webhooks for passive bot triggers and message intake
 - Avoid unstable upstream beta token flows by using a local stable HTTP-backed MCP implementation
+
+More precisely, this plugin focuses on the team collaboration layer: message-triggered execution, shared result delivery, Docs and knowledge workflows, project digests, and permission-aware organizational automation.
 
 ## 5-Minute Private Assistant Push
 
@@ -88,7 +90,48 @@ Edit `.env`:
 FEISHU_APP_ID=cli_xxx
 FEISHU_APP_SECRET=xxx
 FEISHU_BOT_REPLY_TEXT=收到，我已接入 Codex Feishu 插件。
+FEISHU_DEFAULT_WORKSPACE=/absolute/path/to/your/workspace
+FEISHU_CODEX_COMMAND="node plugins/feishu/scripts/feishu-codex-runner.js"
+FEISHU_CODEX_COMMAND_MODE=stdin
+FEISHU_RUNNER_COMMAND="codex exec"
 ```
+
+If you only want a connectivity check, `FEISHU_BOT_REPLY_TEXT` is enough. To enable the current minimal bridge flow, also set `FEISHU_CODEX_COMMAND` so incoming text messages can trigger a local command. The current command set is: `/help`, `/new`, `/status`, `/stop`, `/cd <path>`.
+
+Local execution protocol:
+
+- `FEISHU_CODEX_COMMAND_MODE=stdin`: default mode. The bot writes `Session`, `Workspace`, and the raw message text to stdin.
+- `FEISHU_CODEX_COMMAND_MODE=env`: no stdin payload. Use environment variables such as `FEISHU_MESSAGE_TEXT`, `FEISHU_MESSAGE_PAYLOAD`, `FEISHU_SESSION_KEY`, `FEISHU_SESSION_WORKSPACE`, and `FEISHU_RUN_ID`.
+
+The recommended setup is to point `FEISHU_CODEX_COMMAND` to the repo-provided runner and point `FEISHU_RUNNER_COMMAND` to the real downstream command. That keeps the bridge contract stable even when the payload shape evolves.
+
+Minimal access control:
+
+- `FEISHU_BOT_OWNER_OPEN_ID`: owner identity. When set, the owner can trigger execution directly.
+- `FEISHU_BOT_ADMINS`: comma-separated admin `open_id` list.
+- `FEISHU_BOT_ALLOWED_USERS`: comma-separated allowed user `open_id` list.
+- `FEISHU_BOT_ALLOWED_CHATS`: comma-separated allowed group or chat `chat_id` list.
+
+If all four are empty, the bot stays open. As soon as any one of them is configured, the bot switches to controlled mode and unauthorized messages receive a denial reply instead of launching a local command.
+
+Current queue behavior:
+
+- Each session runs at most one local task at a time.
+- If a new message arrives while the current session is still running, the new message is queued instead of being dropped.
+- The current version now drains multiple queued messages in order.
+- `FEISHU_BOT_BATCH_WINDOW_MS` optionally enables a short batching window. When greater than `0`, messages that enter the queue within that window are combined into a single local task.
+
+## 5-Minute Codex Bridge Check
+
+If you want to validate the full `message -> runner -> downstream command -> reply` loop locally before calling real Codex, point the downstream command to the repo-provided echo script:
+
+```env
+FEISHU_CODEX_COMMAND="node plugins/feishu/scripts/feishu-codex-runner.js"
+FEISHU_RUNNER_COMMAND="node plugins/feishu/scripts/feishu-codex-echo.js"
+FEISHU_CODEX_COMMAND_MODE=env
+```
+
+This does not call Codex yet. It simply echoes the incoming message, session key, and workspace back into Feishu so you can verify the bridge contract, session isolation, and reply path first.
 
 In Feishu Open Platform:
 
@@ -106,11 +149,41 @@ npm run feishu:doctor
 npm run feishu:bot
 ```
 
-When the terminal shows `ws client ready`, send a text message in the group. The bot should reply:
+When the terminal shows `ws client ready`, send a text message in the group such as `Please summarize today's project progress`. With the echo setup above, the bot should reply with something like:
 
 ```text
-收到，我已接入 Codex Feishu 插件。
+Feishu Codex Echo
+Session: chat:...
+Workspace: /absolute/path/to/your/workspace
+Message: Please summarize today's project progress
 ```
+
+After that works, switch `FEISHU_RUNNER_COMMAND` back to the real command, for example `codex exec`.
+
+The bot stores a short recent-message history per session and ignores duplicate Feishu `message_id` deliveries, so retry delivery from Feishu does not create duplicate local executions or duplicate replies.
+
+Unified CLI entry:
+
+- `npm run feishu -- doctor`
+- `npm run feishu -- bot`
+- `npm run feishu -- start`
+- `npm run feishu -- stop`
+- `npm run feishu -- restart`
+- `npm run feishu -- status`
+- `npm run feishu -- runner --print-payload`
+- `npm run feishu -- push --preview --message "Completed: shipped docs."`
+- `npm run feishu -- webhook --self-test`
+
+Local service management:
+
+- This version prioritizes macOS `launchd`
+- `start` generates or updates `service/launchd.plist` under the bot state directory
+- `status` combines `launchctl print` output and `service/service.json` into a readable summary
+- Default log paths:
+  - `service/stdout.log`
+  - `service/stderr.log`
+
+Keep real credentials and Feishu identifiers in local `.env` files only. Do not commit real `FEISHU_APP_ID`, `FEISHU_APP_SECRET`, `FEISHU_USER_ACCESS_TOKEN`, `open_id`, `chat_id`, or `message_id` values in docs, examples, logs, or screenshots.
 
 Full guide: [Quickstart Message Bot](./plugins/feishu/skills/feishu/examples/quickstart-message-bot.md)
 
@@ -276,7 +349,7 @@ More details:
 
 - [Webhook event subscription](./plugins/feishu/skills/feishu/reference/webhook.md)
 - [Webhook to bot reply example](./plugins/feishu/skills/feishu/examples/webhook-to-reply.md)
-- [Platform roadmap](./docs/platform-roadmap.md)
+- [Product roadmap](./docs/roadmap.md)
 
 ## Private Assistant Push
 

@@ -4,6 +4,15 @@
 
 这份路线图基于当前 `Feishu for Codex` 已落地能力，以及对 `lark-coding-agent-bridge` 这类飞书编码助手桥接项目的能力差距分析。
 
+随着 Codex 移动端能力持续增强，`Feishu for Codex` 不应继续把自己定义成「把 Codex 搬进飞书聊天框」的远程替代品。个人即时问答、轻量查看结果这类单人场景，会越来越适合直接在 Codex 官方客户端中完成。
+
+这个插件的产品价值，应该明确收口到团队协作场景：
+
+- 飞书群消息总结与多人可消费的结果回写。
+- 项目日报、周报、发布播报和异常提醒。
+- Docs / Wiki / Bitable / Webhook 驱动的组织工作流。
+- 基于群、私聊、工作区和权限边界的稳定执行入口。
+
 当前插件已经具备：
 
 - 稳定 HTTP-backed MCP：IM、Docs、Wiki、Contacts 基础工具。
@@ -12,17 +21,18 @@
 - 项目更新推送脚本：预览、测试发送、确认发送。
 - Webhook 接收服务：`url_verification`、签名校验、加密事件解密、事件日志。
 
-后续版本的重点不是继续堆更多 OpenAPI wrapper，而是把插件升级成更完整的飞书协作入口：能接收消息、运行 Codex、管理上下文、回写结果，并能长期稳定运行。
+后续版本的重点不是继续堆更多 OpenAPI wrapper，也不是和 Codex 移动端竞争通用聊天能力，而是把插件升级成更完整的飞书协作入口：能接收消息、运行 Codex、管理上下文、回写结果，并能长期稳定运行。
 
 ## v0.2.0: Codex Message Bridge
 
-目标：把当前固定回复机器人升级为「飞书消息 -> Codex 执行 -> 回复飞书」的最小可用桥接链路。
+目标：把当前固定回复机器人升级为「飞书消息 -> Codex 执行 -> 回复飞书」的最小可用桥接链路，优先验证团队消息触发与结果分发闭环。
 
 ### Scope
 
 - 将 `feishu-long-connection-bot.js` 从固定文本回复升级为 Codex 执行入口。
 - 支持收到群聊或私聊文本后调用本地 Codex workflow。
 - 支持按 `chat_id` 或 `open_id` 隔离基础会话状态。
+- 优先支持群聊场景，确保同一个协作现场里的连续对话和结果回写稳定可用。
 - 增加最小命令集：
   - `/help`
   - `/new`
@@ -47,10 +57,11 @@
 - 暂不做流式卡片更新。
 - 暂不做图片、文件附件处理。
 - 暂不支持多 agent profile。
+- 暂不把「个人陪聊式 bot」作为主目标场景。
 
 ## v0.3.0: Service, Queue, and Access Control
 
-目标：让插件从「能跑一次」升级为「可以长期运行，并且默认安全」。
+目标：让插件从「能跑一次」升级为「可以长期运行，并且默认安全」，适合团队固定群、固定工作区和长期协作场景。
 
 ### Scope
 
@@ -78,6 +89,7 @@
   - Codex 执行失败时给出飞书端可读错误。
   - OpenAPI 失败时输出权限、机器人可见性、应用发布状态等诊断提示。
 - 增加本地状态目录说明和迁移策略。
+- 增加基础可观测性说明，便于团队排查谁触发了什么任务、失败在哪一层。
 
 ### Acceptance Criteria
 
@@ -95,7 +107,7 @@
 
 ## v0.4.0: Rich Interaction and Attachments
 
-目标：增强飞书端交互体验，让插件更接近团队日常可用的 AI 编码助手。
+目标：增强飞书端交互体验，让插件更接近团队日常可用的 AI 协作入口。
 
 ### Scope
 
@@ -138,7 +150,13 @@
 
 ## Long-Term Direction
 
-长期方向是把 `Feishu for Codex` 做成团队协作中的稳定 AI 编码入口，而不是单纯的 OpenAPI 工具集合。
+长期方向是把 `Feishu for Codex` 做成团队协作中的稳定 AI 编码入口，而不是单纯的 OpenAPI 工具集合，或 Codex 移动端的聊天替代品。
+
+产品判断：
+
+- 对个人即时问答场景，移动端 Codex 会持续削弱飞书 bot 的独立价值。
+- 对团队协作、消息分发、组织上下文和工作流闭环场景，飞书集成价值仍然会持续增强。
+- 因此路线图应优先投资「协作基础设施能力」，而不是泛化聊天能力。
 
 优先顺序：
 
@@ -156,6 +174,15 @@
 
 This roadmap is based on the current `Feishu for Codex` implementation and the capability gap against Feishu coding-agent bridge projects such as `lark-coding-agent-bridge`.
 
+As Codex mobile becomes more capable, `Feishu for Codex` should not position itself as a remote substitute for the Codex client inside a chat app. Personal quick questions and lightweight follow-ups will increasingly fit the native Codex client better.
+
+The plugin should stay focused on team collaboration workflows:
+
+- summarize group discussions and write results back for multiple readers
+- push project digests, release notices, and exception alerts
+- power Docs, Wiki, Bitable, and Webhook driven organizational workflows
+- provide a stable execution entry point with chat, workspace, and permission boundaries
+
 The plugin already includes:
 
 - Stable HTTP-backed MCP tools for IM, Docs, Wiki, and Contacts.
@@ -164,17 +191,18 @@ The plugin already includes:
 - A project update push script with preview, test send, and confirmed send modes.
 - A webhook receiver with `url_verification`, signature verification, encrypted payload decryption, and event logging.
 
-The next versions should focus on turning the plugin into a real Feishu collaboration entry point: receive messages, run Codex, manage conversation state, send results back, and run reliably over time.
+The next versions should focus on turning the plugin into a real Feishu collaboration entry point: receive messages, run Codex, manage conversation state, send results back, and run reliably over time. They should not compete with Codex mobile on general-purpose chat.
 
 ## v0.2.0: Codex Message Bridge
 
-Goal: upgrade the current fixed-reply bot into a minimal Feishu message to Codex execution bridge.
+Goal: upgrade the current fixed-reply bot into a minimal Feishu message to Codex execution bridge, with team message triggering and result delivery as the first priority.
 
 ### Scope
 
 - Upgrade `feishu-long-connection-bot.js` from fixed replies to a Codex execution entry point.
 - Run local Codex workflows from group or private text messages.
 - Maintain basic session state by `chat_id` or `open_id`.
+- Prioritize group chat continuity so one collaboration thread can keep context and receive shared results.
 - Add minimal commands:
   - `/help`
   - `/new`
@@ -199,10 +227,11 @@ Goal: upgrade the current fixed-reply bot into a minimal Feishu message to Codex
 - No streaming cards yet.
 - No image or file attachments yet.
 - No multi-agent profile support yet.
+- No attempt to optimize for personal chat companion scenarios yet.
 
 ## v0.3.0: Service, Queue, and Access Control
 
-Goal: make the plugin safe and stable enough to run continuously.
+Goal: make the plugin safe and stable enough to run continuously in fixed team chats and bound workspaces.
 
 ### Scope
 
@@ -230,6 +259,7 @@ Goal: make the plugin safe and stable enough to run continuously.
   - user-readable Feishu replies for Codex failures
   - diagnostics for OpenAPI permission, bot visibility, and app publish status problems
 - Document the local state directory and migration strategy.
+- Add basic observability guidance so teams can inspect who triggered what and where failures happened.
 
 ### Acceptance Criteria
 
@@ -290,7 +320,13 @@ Goal: improve the Feishu-side interaction quality so the plugin feels usable in 
 
 ## Long-Term Direction
 
-The long-term direction is to make `Feishu for Codex` a stable AI coding entry point for team collaboration, not just a collection of OpenAPI tools.
+The long-term direction is to make `Feishu for Codex` a stable AI coding entry point for team collaboration, not just a collection of OpenAPI tools or a chat substitute for Codex mobile.
+
+Product view:
+
+- Codex mobile will keep reducing the standalone value of a Feishu bot for personal quick questions.
+- Feishu integration still gains value in team collaboration, shared context, notifications, and workflow closure.
+- The roadmap should therefore invest in collaboration infrastructure instead of generic chat breadth.
 
 Priority order:
 

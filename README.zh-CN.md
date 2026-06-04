@@ -1,6 +1,6 @@
 # Feishu for Codex
 
-面向 Codex 的开源飞书插件，重点服务于高频团队协作场景。
+面向 Codex 的开源飞书插件，重点服务于高频团队协作场景，而不是作为 Codex 移动端的聊天替代品。
 
 [English README](./README.md)
 
@@ -26,6 +26,8 @@
 - 将 Codex 项目日报、周报推送到飞书私人助理或群聊
 - 接收飞书事件订阅 Webhook，用于机器人被动触发和群消息入口
 - 用本地稳定 HTTP MCP 实现，绕开上游 beta token 链路不稳定的问题
+
+更准确地说，这个插件优先解决「团队协作入口」问题：群消息触发、结果分发、文档与知识库联动、项目播报，以及带权限边界的组织工作流闭环。
 
 ## 5 分钟私人助理推送
 
@@ -88,7 +90,48 @@ npm install
 FEISHU_APP_ID=cli_xxx
 FEISHU_APP_SECRET=xxx
 FEISHU_BOT_REPLY_TEXT=收到，我已接入 Codex Feishu 插件。
+FEISHU_DEFAULT_WORKSPACE=/absolute/path/to/your/workspace
+FEISHU_CODEX_COMMAND="node plugins/feishu/scripts/feishu-codex-runner.js"
+FEISHU_CODEX_COMMAND_MODE=stdin
+FEISHU_RUNNER_COMMAND="codex exec"
 ```
+
+如果只想验证机器人连通性，可以只配 `FEISHU_BOT_REPLY_TEXT`。如果要启用当前版本的最小桥接能力，需要额外配置 `FEISHU_CODEX_COMMAND`，让收到的文本消息转成一次本地命令执行。当前已支持最小命令集：`/help`、`/new`、`/status`、`/stop`、`/cd <path>`。
+
+本地执行协议：
+
+- `FEISHU_CODEX_COMMAND_MODE=stdin`：默认模式。机器人会把 `Session`、`Workspace` 和原始消息文本写到标准输入。
+- `FEISHU_CODEX_COMMAND_MODE=env`：不写 stdin，只通过环境变量传参。可用变量包括 `FEISHU_MESSAGE_TEXT`、`FEISHU_MESSAGE_PAYLOAD`、`FEISHU_SESSION_KEY`、`FEISHU_SESSION_WORKSPACE`、`FEISHU_RUN_ID`。
+
+推荐配置是把 `FEISHU_CODEX_COMMAND` 指到仓库自带的 runner，再用 `FEISHU_RUNNER_COMMAND` 指向真实下游命令。这样后续即使桥接协议扩展，也只需要保持 runner 向后兼容。
+
+最小访问控制：
+
+- `FEISHU_BOT_OWNER_OPEN_ID`：owner。配置后，owner 可直接触发执行。
+- `FEISHU_BOT_ADMINS`：管理员 `open_id` 列表，逗号分隔。
+- `FEISHU_BOT_ALLOWED_USERS`：允许触发执行的用户 `open_id` 列表，逗号分隔。
+- `FEISHU_BOT_ALLOWED_CHATS`：允许触发执行的群或会话 `chat_id` 列表，逗号分隔。
+
+如果这四项都不配，bot 默认开放；只要配置了任意一项，就会进入受控模式，未授权消息只会收到拒绝提示，不会触发本地命令。
+
+当前队列行为：
+
+- 同一会话只会串行执行一个本地任务。
+- 如果新消息到达时当前会话仍在执行，新消息会先进入当前会话队列，而不是直接丢弃。
+- 当前版本已经支持多条排队消息按顺序自动 drain。
+- `FEISHU_BOT_BATCH_WINDOW_MS` 可选开启短时间批处理窗口。大于 `0` 时，窗口内连续进入队列的消息会合并成一个本地任务。
+
+## 5 分钟 Codex Bridge 验证
+
+如果你想先在本地验证「消息 -> runner -> 下游命令 -> 回复文本」这条桥接链路，可以先把下游命令换成仓库自带的 echo 脚本：
+
+```env
+FEISHU_CODEX_COMMAND="node plugins/feishu/scripts/feishu-codex-runner.js"
+FEISHU_RUNNER_COMMAND="node plugins/feishu/scripts/feishu-codex-echo.js"
+FEISHU_CODEX_COMMAND_MODE=env
+```
+
+这样机器人不会真的调用 Codex，而是把收到的消息、会话和工作区信息原样打印回来，适合先验证桥接协议、会话隔离和回复链路。
 
 在飞书开放平台中：
 
@@ -106,11 +149,41 @@ npm run feishu:doctor
 npm run feishu:bot
 ```
 
-终端出现 `ws client ready` 后，在群里发一条文本消息。机器人应回复：
+终端出现 `ws client ready` 后，在群里发一条文本消息，例如「请总结今天的项目进展」。如果使用上面的 echo 验证配置，机器人应回复类似：
 
 ```text
-收到，我已接入 Codex Feishu 插件。
+Feishu Codex Echo
+Session: chat:...
+Workspace: /absolute/path/to/your/workspace
+Message: 请总结今天的项目进展
 ```
+
+确认桥接没问题后，再把 `FEISHU_RUNNER_COMMAND` 切回真实命令，例如 `codex exec`。
+
+bot 会在每个会话里保存一小段最近消息记录，并忽略重复投递的飞书 `message_id`，避免飞书重试投递造成重复本地执行或重复回复。
+
+统一 CLI 入口：
+
+- `npm run feishu -- doctor`
+- `npm run feishu -- bot`
+- `npm run feishu -- start`
+- `npm run feishu -- stop`
+- `npm run feishu -- restart`
+- `npm run feishu -- status`
+- `npm run feishu -- runner --print-payload`
+- `npm run feishu -- push --preview --message "Completed: shipped docs."`
+- `npm run feishu -- webhook --self-test`
+
+本地 service 管理：
+
+- 当前版本优先支持 macOS `launchd`
+- `start` 会生成或更新 state 目录下的 `service/launchd.plist`
+- `status` 会结合 `launchctl print` 和 `service/service.json` 输出人类可读摘要
+- 默认日志路径：
+  - `service/stdout.log`
+  - `service/stderr.log`
+
+真实凭证和飞书标识只保留在本地 `.env`。不要把真实 `FEISHU_APP_ID`、`FEISHU_APP_SECRET`、`FEISHU_USER_ACCESS_TOKEN`、`open_id`、`chat_id` 或 `message_id` 写进文档、示例、日志或截图。
 
 完整指引：[Quickstart Message Bot](./plugins/feishu/skills/feishu/examples/quickstart-message-bot.md)
 
@@ -276,7 +349,7 @@ https://your-public-domain.example/webhook/feishu
 
 - [Webhook 事件订阅](./plugins/feishu/skills/feishu/reference/webhook.md)
 - [Webhook 到机器人回复示例](./plugins/feishu/skills/feishu/examples/webhook-to-reply.md)
-- [平台路线说明](./docs/platform-roadmap.md)
+- [产品路线图](./docs/roadmap.md)
 
 ## 私人助理推送
 
