@@ -67,6 +67,7 @@ require_executable "${REPO_ROOT}/scripts/check-sensitive-values.sh"
 python3 - <<'PY' "${REPO_ROOT}"
 import json
 import pathlib
+import re
 import subprocess
 import sys
 
@@ -82,6 +83,35 @@ for relative in [
     with (repo_root / relative).open("r", encoding="utf-8") as fh:
         json.load(fh)
     print(f"ok: valid JSON {relative}")
+
+readme = repo_root / "README.md"
+readme_text = readme.read_text(encoding="utf-8")
+for forbidden in [
+    "README" + ".zh-CN.md",
+    "docs/" + "releases/",
+    "case-" + "studies/",
+    "github.com/" + "hunkwu/book",
+]:
+    if forbidden in readme_text:
+        raise SystemExit(f"README contains removed reference: {forbidden}")
+
+readme_targets = [
+    match.group(1).strip()
+    for match in re.finditer(r"!?\[[^\]]*\]\(([^)]+)\)", readme_text)
+]
+readme_targets.extend(
+    match.group(1).strip()
+    for match in re.finditer(r"<img\b[^>]*\bsrc=[\"']([^\"']+)[\"']", readme_text)
+)
+
+for target in readme_targets:
+    if not target or target.startswith(("#", "http://", "https://", "mailto:")):
+        continue
+    local_path = target.split("#", 1)[0]
+    if local_path and not (repo_root / local_path).exists():
+        raise SystemExit(f"README local link is missing: {target}")
+
+print("ok: README local links and removed references check passed")
 
 mcp_script = plugin_dir / "scripts" / "feishu_http_mcp.py"
 init_request = {

@@ -46,7 +46,7 @@ Recommended local command flow:
 npm run feishu:project-update -- --preview --mode weekly --file ./plugins/feishu/skills/feishu/examples/project-update-template.md
 npm run feishu:project-update -- --dry-run-json --mode daily --message "Completed: shipped docs."
 npm run feishu:project-update -- --test --send --confirm
-npm run feishu:project-update -- --send --confirm --title "Weekly Update" --file ./digest.md
+npm run feishu:project-update -- --send --confirm --title "Codex 周报" --file ./plugins/feishu/skills/feishu/examples/project-update-template.md
 ```
 
 Environment defaults:
@@ -133,7 +133,7 @@ The stable local MCP server does not yet provide a dedicated `im_v1_chat_create`
 npm run feishu:project-update -- --preview --mode weekly --file ./plugins/feishu/skills/feishu/examples/project-update-template.md
 npm run feishu:project-update -- --dry-run-json --mode daily --message "Completed: shipped docs."
 npm run feishu:project-update -- --test --send --confirm
-npm run feishu:project-update -- --send --confirm --title "Weekly Update" --file ./digest.md
+npm run feishu:project-update -- --send --confirm --title "Codex 周报" --file ./plugins/feishu/skills/feishu/examples/project-update-template.md
 ```
 
 环境变量默认值：

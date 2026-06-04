@@ -60,7 +60,7 @@ function usage() {
   return `Usage:
   npm run feishu -- digest --preview
   npm run feishu -- digest --send --confirm
-  npm run feishu -- digest --preview --file ./digest.md
+  npm run feishu -- digest --preview --file ./plugins/feishu/skills/feishu/examples/project-update-template.md
   npm run feishu -- digest --send --confirm --title "Codex 日报"
 
 Options:

@@ -74,7 +74,7 @@ function usage() {
   npm run feishu:project-update -- --preview --mode daily --file ./plugins/feishu/skills/feishu/examples/project-update-template.md
   npm run feishu:project-update -- --dry-run-json --mode weekly --message "已完成: 发布文档"
   npm run feishu:project-update -- --test --send --confirm
-  npm run feishu:project-update -- --send --confirm --title "Codex 周报" --file ./digest.md
+  npm run feishu:project-update -- --send --confirm --title "Codex 周报" --file ./plugins/feishu/skills/feishu/examples/project-update-template.md
 
 Options:
   --preview                 Render a local preview. Default when --confirm is absent.

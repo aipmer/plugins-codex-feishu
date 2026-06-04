@@ -29,7 +29,7 @@ Local command path:
 npm run feishu:project-update -- --preview --mode weekly --file ./plugins/feishu/skills/feishu/examples/project-update-template.md
 npm run feishu:project-update -- --dry-run-json --mode daily --message "Completed: shipped docs."
 npm run feishu:project-update -- --test --send --confirm
-npm run feishu:project-update -- --send --confirm --title "Weekly Update" --file ./digest.md
+npm run feishu:project-update -- --send --confirm --title "Codex 周报" --file ./plugins/feishu/skills/feishu/examples/project-update-template.md
 ```
 
 If the command reports missing configuration, guide the user through `FEISHU_APP_ID`, `FEISHU_APP_SECRET`, `FEISHU_DEFAULT_RECEIVE_ID`, `FEISHU_DEFAULT_RECEIVE_ID_TYPE`, and optionally `FEISHU_DEFAULT_UPDATE_MODE` before sending.
@@ -128,7 +128,7 @@ See `reference/webhook.md` for the Feishu Open Platform configuration checklist.
 npm run feishu:project-update -- --preview --mode weekly --file ./plugins/feishu/skills/feishu/examples/project-update-template.md
 npm run feishu:project-update -- --dry-run-json --mode daily --message "Completed: shipped docs."
 npm run feishu:project-update -- --test --send --confirm
-npm run feishu:project-update -- --send --confirm --title "Weekly Update" --file ./digest.md
+npm run feishu:project-update -- --send --confirm --title "Codex 周报" --file ./plugins/feishu/skills/feishu/examples/project-update-template.md
 ```
 
 如果命令提示缺少配置，优先检查：
