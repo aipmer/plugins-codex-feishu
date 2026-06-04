@@ -1,37 +1,39 @@
 # Feishu for Codex
 
-Open-source Feishu plugin for Codex, designed for high-frequency team collaboration workflows rather than as a chat substitute for Codex mobile.
+Open-source Feishu plugin for Codex.
+Chinese-first documentation with a short English summary.
+Focus: message-triggered execution, Docs and Wiki workflows, private assistant push, and lightweight team collaboration automation.
 
-[中文说明](./README.zh-CN.md)
+面向 Codex 的开源飞书插件，重点服务于高频团队协作场景，而不是作为 Codex 移动端的聊天替代品。
 
-## Maintainer
+## 维护者
 
-- Personal site: [pmer.cn](https://pmer.cn)
-- X: [@ai_pmer](https://x.com/ai_pmer)
-- Related open-source project: [Codex Blue Book](https://github.com/hunkwu/book)
+- 个人站点：[pmer.cn](https://pmer.cn)
+- X 账号：[@ai_pmer](https://x.com/ai_pmer)
+- 关联开源项目：[aipmer/book](https://github.com/aipmer/book)
 
-## Preview
+## 预览
 
-![Feishu plugin marketplace entry](./plugins/feishu/assets/screenshots/plugin-marketplace-real.png)
+![Feishu 插件市场入口](./plugins/feishu/assets/screenshots/plugin-marketplace-real.png)
 
-![Feishu plugin detail page](./plugins/feishu/assets/screenshots/plugin-detail-real.png)
+![Feishu 插件详情页](./plugins/feishu/assets/screenshots/plugin-detail-real.png)
 
-![Install Feishu plugin in Codex](./plugins/feishu/assets/screenshots/plugin-install-real.png)
+![在 Codex 中安装 Feishu 插件](./plugins/feishu/assets/screenshots/plugin-install-real.png)
 
-## What it solves
+## 解决什么问题
 
-- Summarize recent messages from Feishu group chats
-- Search Feishu Docs and Wiki from Codex
-- Draft bot-style answers and send them back to Feishu
-- Push Codex project digests into Feishu private assistant chats or group chats
-- Receive Feishu event subscription webhooks for passive bot triggers and message intake
-- Avoid unstable upstream beta token flows by using a local stable HTTP-backed MCP implementation
+- 总结飞书群聊最近消息
+- 在 Codex 里搜索飞书文档和知识库
+- 生成机器人式回复并回推到飞书
+- 将 Codex 项目日报、周报推送到飞书私人助理或群聊
+- 接收飞书事件订阅 Webhook，用于机器人被动触发和群消息入口
+- 用本地稳定 HTTP MCP 实现，绕开上游 beta token 链路不稳定的问题
 
-More precisely, this plugin focuses on the team collaboration layer: message-triggered execution, shared result delivery, Docs and knowledge workflows, project digests, and permission-aware organizational automation.
+更准确地说，这个插件优先解决「团队协作入口」问题：群消息触发、结果分发、文档与知识库联动、项目播报，以及带权限边界的组织工作流闭环。
 
-## 5-Minute Private Assistant Push
+## 5 分钟私人助理推送
 
-Use this path when you want Codex to draft a project update and push it to your Feishu private assistant chat.
+如果你希望让 Codex 生成项目更新，并推送到自己的飞书私人助理私聊，优先走这条路径。
 
 ```bash
 git clone https://github.com/aipmer/plugins-codex-feishu.git
@@ -40,7 +42,7 @@ cp .env.example .env
 npm install
 ```
 
-Edit `.env`:
+编辑 `.env`：
 
 ```env
 FEISHU_APP_ID=cli_xxx
@@ -50,51 +52,70 @@ FEISHU_DEFAULT_RECEIVE_ID_TYPE=open_id
 FEISHU_DEFAULT_UPDATE_MODE=weekly
 ```
 
-Verify credentials and preview the message first:
+先验证凭证，并预览消息：
 
 ```bash
 npm run feishu:doctor
 npm run feishu:project-update -- --preview --mode weekly --file ./plugins/feishu/skills/feishu/examples/project-update-template.md
 ```
 
-Send a short test message before sending the full update:
+正式发送前，先发一条短测试消息：
 
 ```bash
 npm run feishu:project-update -- --test --send --confirm
 npm run feishu:project-update -- --send --confirm --title "Weekly Update" --file ./digest.md
 ```
 
-Useful variants:
+常用变体：
 
 ```bash
-npm run feishu:project-update -- --dry-run-json --mode daily --message "Completed: shipped docs."
+npm run feishu:project-update -- --dry-run-json --mode daily --message "已完成：发布文档"
 npm run feishu:project-update -- --preview --receive-id ou_xxxxx --receive-id-type open_id --file ./digest.md
 ```
 
-If configuration is missing, the script prints the exact missing items and setup steps. `FEISHU_APP_ID` identifies the sending app; `open_id` identifies the recipient user. Real sends require `--confirm`.
+如果配置缺失，脚本会输出缺少的项目和下一步设置指引。`FEISHU_APP_ID` 是发送消息的应用身份；`open_id` 是接收消息的用户身份。真实发送必须带 `--confirm`。
 
-Lightweight digest entry:
+轻量日报入口：
 
 ```bash
 npm run feishu -- digest --preview
 npm run feishu -- digest --send --confirm
 ```
 
-This entry reuses:
+这个入口默认复用：
 
 - `FEISHU_DEFAULT_RECEIVE_ID`
 - `FEISHU_DEFAULT_RECEIVE_ID_TYPE`
 - `./plugins/feishu/skills/feishu/examples/project-update-template.md`
 
-To override the template:
+如果需要自定义模板：
 
 ```bash
 npm run feishu -- digest --preview --file ./digest.md
 ```
 
-## 5-Minute Message Bot Quickstart
+获取 `open_id` 的推荐方式：
 
-Use this path when you want to quickly verify Feishu message integration from this GitHub repository. It uses Feishu's official long connection mode, so you do not need a public HTTPS callback URL.
+1. 让目标用户先给机器人发一条私聊消息。
+2. 在飞书开放平台事件日志里查看 `event.sender.sender_id.open_id`。
+3. 或在具备 `contact:user.id:readonly` 权限时，用邮箱解析用户 ID。
+
+常见失败提示：
+
+- 缺少应用凭证：配置 `FEISHU_APP_ID` 和 `FEISHU_APP_SECRET`。
+- 缺少接收人：配置 `FEISHU_DEFAULT_RECEIVE_ID` 或通过 `--receive-id` 传入。
+- 接收人类型非法：目前只支持 `open_id` 和 `chat_id`。
+- 权限不足：检查 `im:message`、`im:message:send_as_bot` 和租户审批。
+- 已授权但仍无法投递：确认应用已发布，且接收人位于可见范围内。
+
+详细说明见：
+
+- [Authentication: App ID vs Recipient ID](./plugins/feishu/skills/feishu/reference/auth.md#app-id-vs-recipient-id)
+- [Messages: Send Private Assistant Message](./plugins/feishu/skills/feishu/reference/messages.md#send-private-assistant-message)
+
+## 5 分钟消息机器人快速接入
+
+如果你希望从这个 GitHub 仓库快速验证飞书消息对接，优先走这条路径。它使用飞书官方长连接模式，不需要公网 HTTPS 回调地址。
 
 ```bash
 git clone https://github.com/aipmer/plugins-codex-feishu.git
@@ -103,7 +124,7 @@ cp .env.example .env
 npm install
 ```
 
-Edit `.env`:
+编辑 `.env`：
 
 ```env
 FEISHU_APP_ID=cli_xxx
@@ -115,34 +136,34 @@ FEISHU_CODEX_COMMAND_MODE=stdin
 FEISHU_RUNNER_COMMAND="codex exec"
 ```
 
-If you only want a connectivity check, `FEISHU_BOT_REPLY_TEXT` is enough. To enable the current minimal bridge flow, also set `FEISHU_CODEX_COMMAND` so incoming text messages can trigger a local command. The current command set is: `/help`, `/new`, `/status`, `/ids`, `/stop`, `/cd <path>`.
+如果只想验证机器人连通性，可以只配 `FEISHU_BOT_REPLY_TEXT`。如果要启用当前版本的最小桥接能力，需要额外配置 `FEISHU_CODEX_COMMAND`，让收到的文本消息转成一次本地命令执行。当前已支持最小命令集：`/help`、`/new`、`/status`、`/ids`、`/stop`、`/cd <path>`。
 
-Local execution protocol:
+本地执行协议：
 
-- `FEISHU_CODEX_COMMAND_MODE=stdin`: default mode. The bot writes `Session`, `Workspace`, and the raw message text to stdin.
-- `FEISHU_CODEX_COMMAND_MODE=env`: no stdin payload. Use environment variables such as `FEISHU_MESSAGE_TEXT`, `FEISHU_MESSAGE_PAYLOAD`, `FEISHU_SESSION_KEY`, `FEISHU_SESSION_WORKSPACE`, and `FEISHU_RUN_ID`.
+- `FEISHU_CODEX_COMMAND_MODE=stdin`：默认模式。机器人会把 `Session`、`Workspace` 和原始消息文本写到标准输入。
+- `FEISHU_CODEX_COMMAND_MODE=env`：不写 stdin，只通过环境变量传参。可用变量包括 `FEISHU_MESSAGE_TEXT`、`FEISHU_MESSAGE_PAYLOAD`、`FEISHU_SESSION_KEY`、`FEISHU_SESSION_WORKSPACE`、`FEISHU_RUN_ID`。
 
-The recommended setup is to point `FEISHU_CODEX_COMMAND` to the repo-provided runner and point `FEISHU_RUNNER_COMMAND` to the real downstream command. That keeps the bridge contract stable even when the payload shape evolves.
+推荐配置是把 `FEISHU_CODEX_COMMAND` 指到仓库自带的 runner，再用 `FEISHU_RUNNER_COMMAND` 指向真实下游命令。这样后续即使桥接协议扩展，也只需要保持 runner 向后兼容。
 
-Minimal access control:
+最小访问控制：
 
-- `FEISHU_BOT_OWNER_OPEN_ID`: owner identity. When set, the owner can trigger execution directly.
-- `FEISHU_BOT_ADMINS`: comma-separated admin `open_id` list.
-- `FEISHU_BOT_ALLOWED_USERS`: comma-separated allowed user `open_id` list.
-- `FEISHU_BOT_ALLOWED_CHATS`: comma-separated allowed group or chat `chat_id` list.
+- `FEISHU_BOT_OWNER_OPEN_ID`：owner。配置后，owner 可直接触发执行。
+- `FEISHU_BOT_ADMINS`：管理员 `open_id` 列表，逗号分隔。
+- `FEISHU_BOT_ALLOWED_USERS`：允许触发执行的用户 `open_id` 列表，逗号分隔。
+- `FEISHU_BOT_ALLOWED_CHATS`：允许触发执行的群或会话 `chat_id` 列表，逗号分隔。
 
-If all four are empty, the bot stays open. As soon as any one of them is configured, the bot switches to controlled mode and unauthorized messages receive a denial reply instead of launching a local command.
+如果这四项都不配，bot 默认开放；只要配置了任意一项，就会进入受控模式，未授权消息只会收到拒绝提示，不会触发本地命令。
 
-Current queue behavior:
+当前队列行为：
 
-- Each session runs at most one local task at a time.
-- If a new message arrives while the current session is still running, the new message is queued instead of being dropped.
-- The current version now drains multiple queued messages in order.
-- `FEISHU_BOT_BATCH_WINDOW_MS` optionally enables a short batching window. When greater than `0`, messages that enter the queue within that window are combined into a single local task.
+- 同一会话只会串行执行一个本地任务。
+- 如果新消息到达时当前会话仍在执行，新消息会先进入当前会话队列，而不是直接丢弃。
+- 当前版本已经支持多条排队消息按顺序自动 drain。
+- `FEISHU_BOT_BATCH_WINDOW_MS` 可选开启短时间批处理窗口。大于 `0` 时，窗口内连续进入队列的消息会合并成一个本地任务。
 
-## 5-Minute Codex Bridge Check
+## 5 分钟 Codex Bridge 验证
 
-If you want to validate the full `message -> runner -> downstream command -> reply` loop locally before calling real Codex, point the downstream command to the repo-provided echo script:
+如果你想先在本地验证「消息 -> runner -> 下游命令 -> 回复文本」这条桥接链路，可以先把下游命令换成仓库自带的 echo 脚本：
 
 ```env
 FEISHU_CODEX_COMMAND="node plugins/feishu/scripts/feishu-codex-runner.js"
@@ -150,40 +171,40 @@ FEISHU_RUNNER_COMMAND="node plugins/feishu/scripts/feishu-codex-echo.js"
 FEISHU_CODEX_COMMAND_MODE=env
 ```
 
-This does not call Codex yet. It simply echoes the incoming message, session key, and workspace back into Feishu so you can verify the bridge contract, session isolation, and reply path first.
+这样机器人不会真的调用 Codex，而是把收到的消息、会话和工作区信息原样打印回来，适合先验证桥接协议、会话隔离和回复链路。
 
-In Feishu Open Platform:
+在飞书开放平台中：
 
-1. Create a self-built app and copy `App ID` / `App Secret`.
-2. Go to `Events and Callbacks`.
-3. Select `Receive events through long connection`.
-4. Subscribe to `im.message.receive_v1`.
-5. Grant `im:message` and `im:message:send_as_bot`.
-6. Publish the app and add the bot to a test group.
+1. 创建企业自建应用，并复制 `App ID` / `App Secret`。
+2. 进入「事件与回调」。
+3. 订阅方式选择「使用长连接接收事件」。
+4. 订阅 `im.message.receive_v1`。
+5. 开通 `im:message` 和 `im:message:send_as_bot`。
+6. 发布应用，并把机器人加入测试群。
 
-Verify:
+验证：
 
 ```bash
 npm run feishu:doctor
 npm run feishu:bot
 ```
 
-When the terminal shows `ws client ready`, send a text message in the group such as `Please summarize today's project progress`. With the echo setup above, the bot should reply with something like:
+终端出现 `ws client ready` 后，在群里发一条文本消息，例如「请总结今天的项目进展」。如果使用上面的 echo 验证配置，机器人应回复类似：
 
 ```text
 Feishu Codex Echo
 Session: chat:...
 Workspace: /absolute/path/to/your/workspace
-Message: Please summarize today's project progress
+Message: 请总结今天的项目进展
 ```
 
-After that works, switch `FEISHU_RUNNER_COMMAND` back to the real command, for example `codex exec`.
+确认桥接没问题后，再把 `FEISHU_RUNNER_COMMAND` 切回真实命令，例如 `codex exec`。
 
-The bot stores a short recent-message history per session and ignores duplicate Feishu `message_id` deliveries, so retry delivery from Feishu does not create duplicate local executions or duplicate replies.
+bot 会在每个会话里保存一小段最近消息记录，并忽略重复投递的飞书 `message_id`，避免飞书重试投递造成重复本地执行或重复回复。
 
-`/status` now includes the current `chat_id`, sender `open_id`, bridge command, runner command, and local service summary when available. `/ids` prints the current session identifiers together with allowlist-ready `FEISHU_BOT_ALLOWED_CHATS` and `FEISHU_BOT_ALLOWED_USERS` snippets.
+`/status` 现在会带出当前 `chat_id`、发送者 `open_id`、bridge command、runner command 和本地 service 摘要。`/ids` 会直接打印当前会话标识，并给出可直接复制的 `FEISHU_BOT_ALLOWED_CHATS`、`FEISHU_BOT_ALLOWED_USERS` 配置片段。
 
-Unified CLI entry:
+统一 CLI 入口：
 
 - `npm run feishu -- doctor`
 - `npm run feishu -- digest --preview`
@@ -196,18 +217,16 @@ Unified CLI entry:
 - `npm run feishu -- push --preview --message "已完成：发布文档"`
 - `npm run feishu -- webhook --self-test`
 
-Local service management:
+本地 service 管理：
 
-- This version prioritizes macOS `launchd`
-- `start` generates or updates `service/launchd.plist` under the bot state directory
-- `status` combines `launchctl print` output and `service/service.json` into a readable summary
-- Default log paths:
+- 当前版本优先支持 macOS `launchd`
+- `start` 会生成或更新 state 目录下的 `service/launchd.plist`
+- `status` 会结合 `launchctl print` 和 `service/service.json` 输出人类可读摘要
+- 默认日志路径：
   - `service/stdout.log`
   - `service/stderr.log`
 
-Keep real credentials and Feishu identifiers in local `.env` files only. Do not commit real `FEISHU_APP_ID`, `FEISHU_APP_SECRET`, `FEISHU_USER_ACCESS_TOKEN`, `open_id`, `chat_id`, or `message_id` values in docs, examples, logs, or screenshots.
-
-If you only need a personal scheduled digest on your own Mac, the current recommendation is to wire a minimal macOS `launchd` job that calls:
+如果你只想在自己机器上做一个最小定时任务，当前推荐直接在 macOS `launchd` 里调用：
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
@@ -233,268 +252,118 @@ If you only need a personal scheduled digest on your own Mac, the current recomm
 </plist>
 ```
 
-This repository only documents that path. It does not add a second built-in schedule service manager.
+当前仓库只提供这类文档级接入方式，不内建第二套 schedule service 管理。
 
-Full guide: [Quickstart Message Bot](./plugins/feishu/skills/feishu/examples/quickstart-message-bot.md)
+## 安装到 Codex
 
-## Core scenarios
+普通用户推荐直接在 Codex 里通过 GitHub 仓库添加插件市场，不需要先手动执行 `git clone`。
 
-### 1. Group message summary
+在 `Add Plugin Marketplace` 中填写：
 
-Turn recent chat history into:
+- Source：`https://github.com/aipmer/plugins-codex-feishu.git`
+- Git reference：`main`
+- Sparse path：`plugins/feishu`
 
-- decisions
-- action items
-- blockers
-- owners
+如果当前 Codex 版本需要 repo-local marketplace 文件，则使用：
 
-### 2. Bot conversation reply
+- Marketplace path：`.agents/plugins/marketplace.json`
 
-Use Feishu chat context plus Docs or Wiki retrieval to produce concise answers for a target chat.
+添加成功后，插件会出现在 `Codex Community` 这个市场下。这个名称来自仓库内的 `.agents/plugins/marketplace.json`。
 
-### 3. Codex project digest push
+### Built by OpenAI / Codex Community / Personal 的区别
 
-Generate daily or weekly project summaries from Codex and push them into Feishu chats.
+- `Built by OpenAI`：Codex 官方内置插件，通常由 OpenAI 维护。
+- `Codex Community`：从这个 GitHub 仓库添加的社区插件市场，适合开源分发和普通用户安装。
+- `Personal`：用户本机个人插件目录，适合自己本地开发、调试或未公开插件。
 
-### 4. Webhook event subscription
+一般用户只需要安装 `Codex Community` 这一份，不需要再安装到 `Personal`。如果你要参与开发或修改插件源码，再使用下面的开发者方式。
 
-Receive Feishu Open Platform event callbacks with support for:
+### 开发者本地安装
 
-- `url_verification` challenge handling
-- `Verification Token` source checks
-- `X-Lark-Signature` checks
-- `Encrypt Key` encrypted payload decryption
-- stdout or local file event logs for follow-up agent workflow integration
-
-## Repository layout
-
-```text
-.agents/plugins/marketplace.json
-plugins/feishu/
-```
-
-Use `plugins/feishu` as the sparse path when importing from Git.
-
-## Install in Codex
-
-For regular users, the recommended path is to add this GitHub repository directly in Codex. You do not need to run `git clone` first.
-
-In `Add Plugin Marketplace`:
-
-- Source: `https://github.com/aipmer/plugins-codex-feishu.git`
-- Git reference: `main`
-- Sparse path: `plugins/feishu`
-
-If your Codex build expects a repo-local marketplace file, use:
-
-- Marketplace path: `.agents/plugins/marketplace.json`
-
-After the marketplace is added, the plugin appears under `Codex Community`. That display name comes from this repository's `.agents/plugins/marketplace.json`.
-
-### Built by OpenAI / Codex Community / Personal
-
-- `Built by OpenAI`: official built-in plugins maintained by OpenAI.
-- `Codex Community`: the community plugin marketplace added from this GitHub repository. This is the recommended path for open-source distribution.
-- `Personal`: your local personal plugin directory. Use this for local development, debugging, or private plugins.
-
-Most users only need the `Codex Community` install. You do not need to install a second copy under `Personal`. Use the developer path below only if you want to modify or contribute to the plugin.
-
-### Developer Local Install
-
-If you want to contribute code, debug scripts, or modify the plugin, clone the repository:
+如果你要贡献代码、调试脚本或修改插件，可以先克隆仓库：
 
 ```bash
 git clone https://github.com/aipmer/plugins-codex-feishu.git
 cd plugins-codex-feishu
-scripts/smoke-test.sh
+npm install
 ```
 
-If you need to sync the repository plugin into your local personal plugin runtime:
+如需同步到本机运行目录，使用：
 
 ```bash
-scripts/sync-local-plugin.sh
+./scripts/sync-local-plugin.sh
 ```
 
-This syncs `plugins/feishu` one-way into the default local runtime directory. Regular install users do not need this step.
+## 核心场景
 
-## Setup
+### 1. 飞书群消息总结
 
-1. Create a Feishu self-built app.
-2. Add this redirect URI:
+把最近群消息整理成：
 
-```text
-http://localhost:3000/callback
-```
+- 决策事项
+- 待办事项
+- 风险阻塞
+- 责任人
 
-3. Grant the scopes required by the open-source workflow:
+### 2. 机器人式对话回复
 
-- `im:chat`
-- `im:message`
-- `docx:document`
-- `wiki:wiki`
-- `wiki:wiki:readonly`
-- `docs:document:import`
-- `drive:drive`
-- `contact:user.id:readonly`
-- `auth:user.id:read`
-- `offline_access`
+结合飞书聊天上下文，以及 Docs / Wiki 检索结果，生成面向群聊或私聊的简洁回复。
 
-4. Export credentials:
+### 3. Codex 项目总结推送
 
-```bash
-export FEISHU_APP_ID="cli_xxx"
-export FEISHU_APP_SECRET="xxx"
-```
+基于 Codex 项目进展生成日报或周报，并推送到飞书私人助理或群聊。
 
-5. Generate an authorization URL:
+### 4. Webhook 事件订阅
 
-```bash
-plugins/feishu/scripts/generate-feishu-auth-url.sh
-```
+接收飞书开放平台事件订阅回调，支持：
 
-6. After browser authorization, exchange the callback code:
+- `url_verification` challenge 校验
+- `Verification Token` 来源校验
+- `X-Lark-Signature` 签名校验
+- `Encrypt Key` 加密事件体解密
+- 将事件输出到 stdout 或本地日志文件，便于后续接入 agent workflow
 
-```bash
-plugins/feishu/scripts/exchange-feishu-code.sh --code "<callback_code>"
-```
+## 稳定运行时
 
-7. Export the returned token:
-
-```bash
-export FEISHU_USER_ACCESS_TOKEN="<oauth_access_token>"
-```
-
-8. Run a quick environment check:
-
-```bash
-plugins/feishu/scripts/doctor-feishu-auth.sh
-```
-
-## Webhook Server
-
-The repository includes a minimal webhook receiver:
-
-```bash
-export FEISHU_VERIFICATION_TOKEN="xxx"
-export FEISHU_ENCRYPT_KEY="xxx"
-
-plugins/feishu/scripts/feishu_webhook_server.py
-```
-
-Default local URL:
-
-```text
-http://127.0.0.1:3000/webhook/feishu
-```
-
-Feishu Open Platform requires a public HTTPS callback URL, for example:
-
-```text
-https://your-public-domain.example/webhook/feishu
-```
-
-Configure it in your self-built app under `Events and Callbacks`, including `Encryption Strategy` and event subscriptions.
-
-More details:
-
-- [Webhook event subscription](./plugins/feishu/skills/feishu/reference/webhook.md)
-- [Webhook to bot reply example](./plugins/feishu/skills/feishu/examples/webhook-to-reply.md)
-- [Product roadmap](./docs/roadmap.md)
-
-## Private Assistant Push
-
-To push Codex daily reports, weekly reports, or execution summaries into a private assistant chat, use the recipient user's `open_id`, not the app's `App ID`.
-
-The default plugin prompt prioritizes this flow:
-
-```text
-Draft a Codex project update and send it to Feishu.
-```
-
-- `FEISHU_APP_ID`: the sending Feishu self-built app, for example `cli_xxx`
-- `open_id`: the recipient user, for example `ou_xxxxx`
-- `chat_id`: a group or private chat, for example `oc_xxxxx`
-
-If the private push is not configured yet, check and guide the user through:
-
-1. Configure `FEISHU_APP_ID` and `FEISHU_APP_SECRET` in the local runtime environment.
-2. Run `plugins/feishu/scripts/doctor-feishu-auth.sh` to verify app credentials and tenant token access.
-3. Get the recipient user's `open_id`.
-4. Send a short test message before sending the full Codex project update.
-5. Set `FEISHU_DEFAULT_UPDATE_MODE` if daily or weekly is the normal default.
-
-Recommended command path:
-
-```bash
-npm run feishu:project-update -- --preview --mode weekly --file ./plugins/feishu/skills/feishu/examples/project-update-template.md
-npm run feishu:project-update -- --dry-run-json --mode daily --message "已完成：发布文档"
-npm run feishu:project-update -- --test --send --confirm
-npm run feishu:project-update -- --send --confirm --title "Weekly Update" --file ./digest.md
-```
-
-Recommended ways to get `open_id`:
-
-1. Ask the target user to send one private message to the bot.
-2. Inspect `event.sender.sender_id.open_id` in Feishu Open Platform event logs.
-3. Or resolve the user by email when the app has `contact:user.id:readonly`.
-
-Common failure hints:
-
-- Missing app credentials: set `FEISHU_APP_ID` and `FEISHU_APP_SECRET`.
-- Missing recipient: set `FEISHU_DEFAULT_RECEIVE_ID` or pass `--receive-id`.
-- Invalid recipient type: only `open_id` and `chat_id` are supported.
-- Permission failure: check `im:message`, `im:message:send_as_bot`, and tenant approval.
-- Delivery failure after authorization: publish the app and verify the recipient is inside visibility scope.
-
-More details:
-
-- [Authentication: App ID vs Recipient ID](./plugins/feishu/skills/feishu/reference/auth.md#app-id-vs-recipient-id)
-- [Messages: Send Private Assistant Message](./plugins/feishu/skills/feishu/reference/messages.md#send-private-assistant-message)
-
-## Local Verification
-
-After changing the plugin, run:
-
-```bash
-scripts/smoke-test.sh
-```
-
-## Community
-
-Contributions and real-world notes are welcome:
-
-- [Contributing guide](./CONTRIBUTING.md)
-- [Case studies](./case-studies/)
-- [Case study template](./case-studies/TEMPLATE.md)
-
-Especially useful contributions include:
-
-- Real Feishu + Codex workflow troubleshooting notes
-- `AGENTS.md` rules that worked in your own project
-- AI tuning tips, prompts, and verification methods
-- Stories about using Codex to ship a product, get users, or earn first revenue
-
-## Stable runtime
-
-The default `feishu-mcp` entry in `.mcp.json` uses the local HTTP-backed implementation in:
+默认 `feishu-mcp` 入口使用本地稳定 HTTP 实现，核心脚本位于：
 
 - `plugins/feishu/scripts/feishu_http_mcp.py`
 
-The upstream beta server is not included in the default plugin runtime. The stable local HTTP-backed server is the recommended path.
+默认插件运行时不再包含上游 beta server。推荐使用当前稳定的本地 HTTP 封装服务。
 
-## Official workflow examples
+## 官方 workflow 示例
 
-- [Group message summary](./plugins/feishu/skills/feishu/examples/group-summary.md)
-- [Bot conversation reply](./plugins/feishu/skills/feishu/examples/bot-reply.md)
-- [Codex project digest push](./plugins/feishu/skills/feishu/examples/project-digest-push.md)
+- [飞书群消息总结](./plugins/feishu/skills/feishu/examples/group-summary.md)
+- [机器人式对话回复](./plugins/feishu/skills/feishu/examples/bot-reply.md)
+- [Codex 项目总结推送](./plugins/feishu/skills/feishu/examples/project-digest-push.md)
 
-## Notes
+## 本地验证
 
-- Tokens are expected to stay in environment variables by default and are not written into repo files.
-- The stable local MCP directly wraps the high-frequency IM, Docs, Wiki, and Contacts flows.
-- Less common endpoints can still be reached through `feishu_openapi_request`.
-- The repository is intended to be importable directly from GitHub as a Codex plugin marketplace source.
+修改插件后建议运行：
 
-## Related Project
+```bash
+scripts/smoke-test.sh
+```
 
-- [hunkwu/book](https://github.com/hunkwu/book) - Codex Blue Book, focused on Codex workflows, multi-surface orchestration, and AI-native product delivery.
+## 社区与贡献
+
+欢迎提交真实使用经验和改进：
+
+- [贡献指南](./CONTRIBUTING.md)
+- [CHANGELOG](./CHANGELOG.md)
+- [开发任务记录](./docs/dev_task.md)
+
+优先欢迎这些内容：
+
+- Codex + 飞书 workflow 的真实踩坑和修复
+- 你项目中有效的 `AGENTS.md` 规则
+- AI 调优技巧、提示词和验证方法
+- 对安装、联调、发布流程更清晰的文档改进
+
+## 说明
+
+- 默认不把 token 写入仓库文件，建议只放在环境变量里。
+- 稳定本地 MCP 已直接封装高频的 IM、Docs、Wiki、Contacts 能力。
+- 更少用或更专门的接口仍然可以通过 `feishu_openapi_request` 调用。
+- 这个仓库的目标是让用户可以直接用 GitHub 仓库地址导入 Codex 插件市场。
+- 真实凭证和飞书标识只保留在本地 `.env`。不要把真实 `FEISHU_APP_ID`、`FEISHU_APP_SECRET`、`FEISHU_USER_ACCESS_TOKEN`、`open_id`、`chat_id` 或 `message_id` 写进文档、示例、日志或截图。

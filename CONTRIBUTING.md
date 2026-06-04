@@ -13,7 +13,7 @@ High-signal contributions are preferred:
 - AI tuning tips: prompts, agent instructions, workflow patterns, or evaluation notes that worked in real projects.
 - Troubleshooting notes: install failures, permission gotchas, token issues, Feishu console settings, and recovery steps.
 - `AGENTS.md` rules: concise project rules that helped Codex work better in your own repo.
-- Case studies: real stories about shipping a project with Codex, including what worked, what failed, and what changed after launch.
+- Real verification notes: practical writeups about what worked, what failed, and how the behavior was verified.
 
 Please avoid:
 
@@ -24,7 +24,7 @@ Please avoid:
 ## Pull Request Process
 
 1. Open an issue first for large changes, new tool families, or behavior changes.
-2. Keep PRs focused. A docs fix, a runtime fix, and a case study should usually be separate PRs.
+2. Keep PRs focused. A docs fix, a runtime fix, and a workflow note should usually be separate PRs.
 3. Run the smoke test before submitting:
 
 ```bash
@@ -57,21 +57,15 @@ scripts/smoke-test.sh
 - Known limitations:
 ```
 
-## Case Study Submissions
+## Verification Notes
 
-Case studies live in [`case-studies/`](./case-studies/). Use [`case-studies/TEMPLATE.md`](./case-studies/TEMPLATE.md) as the starting point.
+If you submit docs or workflow notes, prefer concrete evidence:
 
-Good case studies are specific:
-
-- What did you build?
-- Who was it for?
-- How did Codex help?
-- Which `AGENTS.md` rules mattered?
-- What did you ship in the first 24-72 hours?
-- Did you get users, revenue, feedback, or another concrete result?
-- What would you do differently next time?
-
-It is fine to anonymize revenue, customers, domains, screenshots, or internal details. Keep the learning useful.
+- What changed?
+- What environment was used?
+- How was it verified?
+- Which permissions or tenant settings mattered?
+- What remains a known limitation?
 
 ---
 
@@ -90,7 +84,7 @@ It is fine to anonymize revenue, customers, domains, screenshots, or internal de
 - AI 调优技巧：真实项目里有效的 prompt、agent instructions、workflow 模式或评估方法。
 - 踩坑实录：安装失败、权限问题、token 问题、飞书控制台配置、恢复步骤。
 - `AGENTS.md` 规则：你自己项目中让 Codex 表现更好的简洁规则。
-- 实战案例：用 Codex 推进项目上线的真实故事，包括有效做法、失败点和上线后的变化。
+- 真实验证记录：包括有效做法、失败点、验证路径和已知边界。
 
 请避免：
 
@@ -101,7 +95,7 @@ It is fine to anonymize revenue, customers, domains, screenshots, or internal de
 ## PR 提交流程
 
 1. 大改动、新工具族或行为变更，先开 issue 说明背景。
-2. 保持 PR 聚焦。文档修复、运行时修复、案例投稿通常应拆成不同 PR。
+2. 保持 PR 聚焦。文档修复、运行时修复、工作流说明通常应拆成不同 PR。
 3. 提交前运行：
 
 ```bash
@@ -134,18 +128,12 @@ scripts/smoke-test.sh
 - Known limitations:
 ```
 
-## 实战案例投稿
+## 验证说明
 
-案例放在 [`case-studies/`](./case-studies/)。请从 [`case-studies/TEMPLATE.md`](./case-studies/TEMPLATE.md) 开始。
+如果你提交文档或 workflow 说明，优先补充这些信息：
 
-好的案例要具体：
-
-- 你做了什么产品？
-- 面向谁？
-- Codex 如何帮到你？
-- 哪些 `AGENTS.md` 规则真正有效？
-- 你在最初 24-72 小时内上线了什么？
-- 是否获得用户、收入、反馈或其他具体结果？
-- 下次会怎么改？
-
-可以匿名化收入、客户、域名、截图或内部细节，但请保留对读者有用的实战经验。
+- 改了什么
+- 在什么环境下验证
+- 如何验证
+- 涉及哪些权限或租户设置
+- 还有哪些已知限制

@@ -132,7 +132,7 @@
   - 不同 Feishu app。
   - 不同 agent 命令。
   - 不同默认工作区。
-- 增加真实 case study 模板，鼓励社区提交飞书群总结、项目周报、代码审查等使用案例。
+- 增加真实验证记录模板，鼓励社区提交飞书群总结、项目周报、代码审查等使用经验。
 
 ### Acceptance Criteria
 
@@ -140,7 +140,7 @@
 - 图片或文件消息可以被下载并传给本地 workflow。
 - 用户可以通过命令查看和修改当前会话配置。
 - 多 profile 不互相污染状态目录。
-- README 和 case study 至少覆盖 2 个真实使用流程。
+- README 和 CHANGELOG 至少覆盖 2 个真实使用流程。
 
 ### Out of Scope
 
@@ -302,7 +302,7 @@ Goal: improve the Feishu-side interaction quality so the plugin feels usable in 
   - different Feishu apps
   - different agent commands
   - different default workspaces
-- Add real case study templates for chat summaries, project digests, code review, and team support workflows.
+- Add real verification-note templates for chat summaries, project digests, code review, and team support workflows.
 
 ### Acceptance Criteria
 

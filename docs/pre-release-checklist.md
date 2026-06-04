@@ -5,7 +5,7 @@
 - 真实飞书消息链路可用
 - 本地 service 管理可用
 - 访问控制、队列和状态反馈符合预期
-- README、case study、release note 与真实行为一致
+- README、CHANGELOG、dev_task 与真实行为一致
 
 ---
 
@@ -229,9 +229,8 @@ FEISHU_BOT_BATCH_WINDOW_MS=500
 发布前需要同时更新：
 
 - `README.md`
-- `README.zh-CN.md`
-- `docs/releases/v0.3.0-beta.md`
-- `case-studies/2026-06-04-feishu-group-codex-execution-reply.md`
+- `CHANGELOG.md`
+- `docs/dev_task.md`
 
 确认项：
 
@@ -241,7 +240,7 @@ FEISHU_BOT_BATCH_WINDOW_MS=500
   - macOS `launchd` only
   - local self-hosted
   - text messages first
-- case study 中的能力描述与真实联调证据一致
+- 文档中的能力描述与真实联调证据一致
 
 ---
 
@@ -254,7 +253,7 @@ FEISHU_BOT_BATCH_WINDOW_MS=500
 3. 跑通真实 `codex exec`
 4. 跑通 `launchd start/status/restart/stop`
 5. 补截图和证据
-6. 检查 release note 与 case study
+6. 检查 README、CHANGELOG 与 dev_task
 7. 发布 `v0.3.0-beta`
 
 ---
@@ -270,6 +269,6 @@ FEISHU_BOT_BATCH_WINDOW_MS=500
 - 至少有一条授权拒绝路径被验证
 - 至少有一条串行排队路径被验证
 - 重复消息幂等保护已通过本地测试
-- release note 与 case study 已更新
+- README、CHANGELOG 与 dev_task 已更新
 
 如果以上任一项没有证据，建议不要直接发正式 beta。
