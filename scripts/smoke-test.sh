@@ -768,6 +768,17 @@ project_update_check = subprocess.run(
 if project_update_check.returncode != 0:
     raise SystemExit(project_update_check.stderr or project_update_check.stdout)
 print("ok: project update push syntax check passed")
+
+digest_check = subprocess.run(
+    ["node", "-c", str(plugin_dir / "scripts" / "feishu-daily-digest.js")],
+    stdout=subprocess.PIPE,
+    stderr=subprocess.PIPE,
+    text=True,
+    check=False,
+)
+if digest_check.returncode != 0:
+    raise SystemExit(digest_check.stderr or digest_check.stdout)
+print("ok: lightweight digest syntax check passed")
 PY
 
 if ! FEISHU_APP_ID=cli_xxx FEISHU_APP_SECRET=xxx FEISHU_DEFAULT_RECEIVE_ID=ou_xxxxx FEISHU_DEFAULT_RECEIVE_ID_TYPE=open_id \
@@ -796,6 +807,29 @@ if ! rg -q "Invalid receive_id_type" /tmp/feishu-project-update-invalid.txt; the
   fail "project update invalid receive_id_type message missing"
 fi
 ok "project update invalid receive_id_type path passed"
+
+if ! FEISHU_APP_ID=cli_xxx FEISHU_APP_SECRET=xxx FEISHU_DEFAULT_RECEIVE_ID=ou_xxxxx FEISHU_DEFAULT_RECEIVE_ID_TYPE=open_id \
+  node "${PLUGIN_DIR}/scripts/feishu-daily-digest.js" --preview >/tmp/feishu-daily-digest-preview.txt 2>&1; then
+  fail "lightweight digest preview command failed"
+fi
+if ! rg -q "Digest template:" /tmp/feishu-daily-digest-preview.txt; then
+  fail "lightweight digest preview missing template header"
+fi
+if ! rg -q "Codex 日报" /tmp/feishu-daily-digest-preview.txt; then
+  fail "lightweight digest preview missing Chinese title"
+fi
+if ! rg -q "已完成:" /tmp/feishu-daily-digest-preview.txt; then
+  fail "lightweight digest preview missing completed section"
+fi
+ok "lightweight digest preview path passed"
+
+if ! node "${REPO_ROOT}/scripts/feishu-codex.js" help >/tmp/feishu-codex-help.txt; then
+  fail "feishu CLI help command failed"
+fi
+if ! rg -q "digest" /tmp/feishu-codex-help.txt; then
+  fail "feishu CLI help missing digest command"
+fi
+ok "feishu CLI digest help path passed"
 
 "${REPO_ROOT}/scripts/check-sensitive-values.sh"
 

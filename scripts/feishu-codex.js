@@ -10,6 +10,7 @@ const HELP_TEXT = `Usage:
 
 Commands:
   bot       Run the Feishu long-connection bot
+  digest    Render or send the lightweight daily digest
   doctor    Run auth and environment checks
   start     Start the Feishu bot via launchd
   stop      Stop the Feishu bot service
@@ -22,6 +23,7 @@ Commands:
 
 Examples:
   npm run feishu -- doctor
+  npm run feishu -- digest --preview
   npm run feishu -- bot
   npm run feishu -- start
   npm run feishu -- status
@@ -58,6 +60,10 @@ const COMMANDS = {
   push: {
     command: 'node',
     args: [path.join('plugins', 'feishu', 'scripts', 'feishu-project-update.js')],
+  },
+  digest: {
+    command: 'node',
+    args: [path.join('plugins', 'feishu', 'scripts', 'feishu-daily-digest.js')],
   },
   runner: {
     command: 'node',

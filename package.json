@@ -9,6 +9,7 @@
     "feishu": "node scripts/feishu-codex.js",
     "feishu:doctor": "node scripts/feishu-doctor.js",
     "feishu:bot": "node plugins/feishu/scripts/feishu-long-connection-bot.js",
+    "feishu:digest": "node plugins/feishu/scripts/feishu-daily-digest.js",
     "feishu:runner": "node plugins/feishu/scripts/feishu-codex-runner.js",
     "feishu:project-update": "node plugins/feishu/scripts/feishu-project-update.js",
     "smoke": "scripts/smoke-test.sh"

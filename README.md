@@ -73,6 +73,25 @@ npm run feishu:project-update -- --preview --receive-id ou_xxxxx --receive-id-ty
 
 If configuration is missing, the script prints the exact missing items and setup steps. `FEISHU_APP_ID` identifies the sending app; `open_id` identifies the recipient user. Real sends require `--confirm`.
 
+Lightweight digest entry:
+
+```bash
+npm run feishu -- digest --preview
+npm run feishu -- digest --send --confirm
+```
+
+This entry reuses:
+
+- `FEISHU_DEFAULT_RECEIVE_ID`
+- `FEISHU_DEFAULT_RECEIVE_ID_TYPE`
+- `./plugins/feishu/skills/feishu/examples/project-update-template.md`
+
+To override the template:
+
+```bash
+npm run feishu -- digest --preview --file ./digest.md
+```
+
 ## 5-Minute Message Bot Quickstart
 
 Use this path when you want to quickly verify Feishu message integration from this GitHub repository. It uses Feishu's official long connection mode, so you do not need a public HTTPS callback URL.
@@ -167,6 +186,7 @@ The bot stores a short recent-message history per session and ignores duplicate 
 Unified CLI entry:
 
 - `npm run feishu -- doctor`
+- `npm run feishu -- digest --preview`
 - `npm run feishu -- bot`
 - `npm run feishu -- start`
 - `npm run feishu -- stop`
@@ -186,6 +206,34 @@ Local service management:
   - `service/stderr.log`
 
 Keep real credentials and Feishu identifiers in local `.env` files only. Do not commit real `FEISHU_APP_ID`, `FEISHU_APP_SECRET`, `FEISHU_USER_ACCESS_TOKEN`, `open_id`, `chat_id`, or `message_id` values in docs, examples, logs, or screenshots.
+
+If you only need a personal scheduled digest on your own Mac, the current recommendation is to wire a minimal macOS `launchd` job that calls:
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>com.hunkwu.feishu-codex.digest</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>/bin/zsh</string>
+    <string>-lc</string>
+    <string>cd /path/to/plugins-codex-feishu && npm run feishu -- digest --send --confirm</string>
+  </array>
+  <key>StartCalendarInterval</key>
+  <dict>
+    <key>Hour</key>
+    <integer>21</integer>
+    <key>Minute</key>
+    <integer>0</integer>
+  </dict>
+</dict>
+</plist>
+```
+
+This repository only documents that path. It does not add a second built-in schedule service manager.
 
 Full guide: [Quickstart Message Bot](./plugins/feishu/skills/feishu/examples/quickstart-message-bot.md)
 
