@@ -1,6 +1,6 @@
 {
   "name": "plugins-codex-feishu",
-  "version": "0.3.0-beta",
+  "version": "0.3.2",
   "private": true,
   "description": "Feishu plugin for Codex with quick message bot verification scripts.",
   "license": "MIT",
