@@ -49,7 +49,6 @@
 - 修正真实联调中错误 Feishu `App ID` 导致的消息无法进入本地 bot 问题。
 - 增加基于 `message_id` 的重复投递保护，避免飞书重试导致重复执行和重复回复。
 - 收口本地联调说明，减少 bot 运行状态、`launchd` service 状态和真实推送状态之间的混淆。
-- 清理旧文档目录与旧 GitHub 用户名引用，Codex 白皮书统一指向 `aipmer/book`。
 
 ### Verification
 
@@ -60,8 +59,3 @@
 - `npm run feishu -- webhook --self-test`
 - 真实飞书 bot bridge 回复链路验证通过
 - 真实私人助理推送与轻量 digest 发送验证通过
-
-### Notes
-
-- `1.0.0` 是当前开源发布口径的首个正式版本号。
-- 早期内部迭代能力已经合并进本版本，不再以 `0.x` 版本对外维护独立 release note。
