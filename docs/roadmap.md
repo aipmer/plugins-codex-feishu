@@ -23,7 +23,7 @@
 
 后续版本的重点不是继续堆更多 OpenAPI wrapper，也不是和 Codex 移动端竞争通用聊天能力，而是把插件升级成更完整的飞书协作入口：能接收消息、运行 Codex、管理上下文、回写结果，并能长期稳定运行。
 
-## v0.2.0: Codex Message Bridge
+## v1.1.0: Codex Message Bridge
 
 目标：把当前固定回复机器人升级为「飞书消息 -> Codex 执行 -> 回复飞书」的最小可用桥接链路，优先验证团队消息触发与结果分发闭环。
 
@@ -59,7 +59,7 @@
 - 暂不支持多 agent profile。
 - 暂不把「个人陪聊式 bot」作为主目标场景。
 
-## v0.3.0: Service, Queue, and Access Control
+## v1.2.0: Service, Queue, and Access Control
 
 目标：让插件从「能跑一次」升级为「可以长期运行，并且默认安全」，适合团队固定群、固定工作区和长期协作场景。
 
@@ -105,7 +105,7 @@
 - 暂不做复杂 Web 管理后台。
 - 暂不抽象钉钉、企微或其他平台适配器。
 
-## v0.4.0: Rich Interaction and Attachments
+## v1.3.0: Rich Interaction and Attachments
 
 目标：增强飞书端交互体验，让插件更接近团队日常可用的 AI 协作入口。
 
@@ -193,7 +193,7 @@ The plugin already includes:
 
 The next versions should focus on turning the plugin into a real Feishu collaboration entry point: receive messages, run Codex, manage conversation state, send results back, and run reliably over time. They should not compete with Codex mobile on general-purpose chat.
 
-## v0.2.0: Codex Message Bridge
+## v1.1.0: Codex Message Bridge
 
 Goal: upgrade the current fixed-reply bot into a minimal Feishu message to Codex execution bridge, with team message triggering and result delivery as the first priority.
 
@@ -229,7 +229,7 @@ Goal: upgrade the current fixed-reply bot into a minimal Feishu message to Codex
 - No multi-agent profile support yet.
 - No attempt to optimize for personal chat companion scenarios yet.
 
-## v0.3.0: Service, Queue, and Access Control
+## v1.2.0: Service, Queue, and Access Control
 
 Goal: make the plugin safe and stable enough to run continuously in fixed team chats and bound workspaces.
 
@@ -275,7 +275,7 @@ Goal: make the plugin safe and stable enough to run continuously in fixed team c
 - No web admin dashboard yet.
 - No DingTalk, WeCom, or multi-platform adapter abstraction yet.
 
-## v0.4.0: Rich Interaction and Attachments
+## v1.3.0: Rich Interaction and Attachments
 
 Goal: improve the Feishu-side interaction quality so the plugin feels usable in real team workflows.
 

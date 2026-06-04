@@ -6,8 +6,8 @@ Feishu for Codex should stay focused on the Feishu ecosystem for the next one or
 
 ### Current Direction
 
-- v0.2: private assistant push, project digest previews, setup diagnostics, Docs/Wiki retrieval, and write-back workflows.
-- v0.3: Feishu Base/Bitable workflows for project status, tasks, risks, release records, and community case intake.
+- v1.1: private assistant push, project digest previews, setup diagnostics, Docs/Wiki retrieval, and write-back workflows.
+- v1.2: Feishu Base/Bitable workflows for project status, tasks, risks, release records, and community case intake.
 - Community growth: real case studies, practical setup notes, and contributor workflows around Feishu + Codex.
 
 ### Platform Decision
@@ -22,7 +22,7 @@ Do not build DingTalk, WeCom, or QQ adapters yet.
 
 Revisit multi-platform support when at least two of these are true:
 
-- Feishu v0.2/v0.3 workflows are stable and documented.
+- Feishu v1.1/v1.2 workflows are stable and documented.
 - There are public case studies from real users.
 - Multiple users ask for the same DingTalk or WeCom workflow.
 - The shared abstraction is obvious from real usage, not from speculative design.
@@ -33,8 +33,8 @@ Feishu for Codex 后续一到两个版本建议继续聚焦飞书生态。
 
 ### 当前方向
 
-- v0.2：私人助理推送、项目更新预览、配置诊断、Docs/Wiki 检索和写回流程。
-- v0.3：飞书 Base / 多维表格，用于项目状态、任务、风险、发布记录和社区案例收集。
+- v1.1：私人助理推送、项目更新预览、配置诊断、Docs/Wiki 检索和写回流程。
+- v1.2：飞书 Base / 多维表格，用于项目状态、任务、风险、发布记录和社区案例收集。
 - 社区增长：围绕 Feishu + Codex 沉淀真实案例、配置指引和贡献流程。
 
 ### 平台决策
@@ -49,7 +49,7 @@ Feishu for Codex 后续一到两个版本建议继续聚焦飞书生态。
 
 满足以下至少两项时，再重新评估多平台支持：
 
-- 飞书 v0.2/v0.3 workflow 已稳定并完成文档化。
+- 飞书 v1.1/v1.2 workflow 已稳定并完成文档化。
 - 已有真实用户公开案例。
 - 多个用户提出相同的钉钉或企微 workflow 需求。
 - 从真实使用中看到了明确的公共抽象，而不是提前设计出来的抽象。

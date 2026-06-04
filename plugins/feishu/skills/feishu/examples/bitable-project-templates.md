@@ -48,12 +48,12 @@ Fields:
 Example record:
 
 ```yaml
-Version: "v0.2-alpha"
-Date: "2026-05-25"
-Summary: "Stabilized private assistant push workflow."
+Version: "v1.0.0"
+Date: "2026-06-04"
+Summary: "Stabilized Feishu bot bridge and project update workflow."
 Verification: "scripts/smoke-test.sh"
 Git Commit: "abc1234"
-Release Note URL: "https://example.com/release-notes/v0-2-alpha"
+Release Note URL: "https://example.com/changelog#100"
 ```
 
 ## Template 3: Risk Tracker

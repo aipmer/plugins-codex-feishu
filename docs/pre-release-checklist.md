@@ -1,6 +1,6 @@
 # Feishu for Codex Pre-Release Checklist
 
-这份清单面向 `v0.3.0-beta` 及之后的版本发布前联调。目标不是只确认代码能跑，而是确认：
+这份清单面向 `v1.0.0` 及之后的版本发布前联调。目标不是只确认代码能跑，而是确认：
 
 - 真实飞书消息链路可用
 - 本地 service 管理可用
@@ -254,13 +254,13 @@ FEISHU_BOT_BATCH_WINDOW_MS=500
 4. 跑通 `launchd start/status/restart/stop`
 5. 补截图和证据
 6. 检查 README、CHANGELOG 与 dev_task
-7. 发布 `v0.3.0-beta`
+7. 发布 `v1.0.0`
 
 ---
 
 ## 8. 发布门槛
 
-满足以下条件，才建议发 `v0.3.0-beta`：
+满足以下条件，才建议发 `v1.0.0`：
 
 - 本地 smoke 全通过
 - 真实飞书群 echo 联调通过

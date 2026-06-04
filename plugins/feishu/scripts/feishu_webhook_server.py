@@ -159,7 +159,7 @@ def log_event(payload):
 
 
 class FeishuWebhookHandler(BaseHTTPRequestHandler):
-    server_version = "FeishuWebhook/0.1"
+    server_version = "FeishuWebhook/1.0"
 
     def do_GET(self):
         if self.path == "/health":

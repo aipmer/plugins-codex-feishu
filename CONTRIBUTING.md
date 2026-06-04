@@ -1,79 +1,8 @@
-# Contributing to Feishu for Codex
-
-Thanks for helping improve Feishu for Codex. This project welcomes practical contributions from people building with Codex, Feishu, MCP, and agent workflows.
-
-[中文说明](#中文说明)
-
-## What To Contribute
-
-High-signal contributions are preferred:
-
-- Feishu workflow improvements: IM, Docs, Wiki, Bitable, Webhook, permissions, or OAuth flows.
-- MCP runtime fixes: tool schemas, error handling, token modes, local diagnostics, and smoke tests.
-- AI tuning tips: prompts, agent instructions, workflow patterns, or evaluation notes that worked in real projects.
-- Troubleshooting notes: install failures, permission gotchas, token issues, Feishu console settings, and recovery steps.
-- `AGENTS.md` rules: concise project rules that helped Codex work better in your own repo.
-- Real verification notes: practical writeups about what worked, what failed, and how the behavior was verified.
-
-Please avoid:
-
-- Secrets, tokens, private chat logs, private documents, or screenshots with sensitive tenant data.
-- Broad rewrites without a concrete bug, use case, or maintenance benefit.
-- Pure marketing copy that does not help users install, debug, or build.
-
-## Pull Request Process
-
-1. Open an issue first for large changes, new tool families, or behavior changes.
-2. Keep PRs focused. A docs fix, a runtime fix, and a workflow note should usually be separate PRs.
-3. Run the smoke test before submitting:
-
-```bash
-scripts/smoke-test.sh
-```
-
-4. For code changes, include:
-   - What changed
-   - Why it changed
-   - How you verified it
-   - Any Feishu permission or tenant requirement
-5. For docs changes, make sure links are relative and examples do not expose private IDs.
-6. For screenshots, redact tenant names, user names, chat IDs, document titles, and tokens.
-
-## Suggested PR Template
-
-```md
-## Summary
-
-- 
-
-## Verification
-
-- [ ] `scripts/smoke-test.sh`
-- [ ] Manual Feishu verification, if applicable:
-
-## Notes
-
-- Required permissions:
-- Known limitations:
-```
-
-## Verification Notes
-
-If you submit docs or workflow notes, prefer concrete evidence:
-
-- What changed?
-- What environment was used?
-- How was it verified?
-- Which permissions or tenant settings mattered?
-- What remains a known limitation?
-
----
-
-## 中文说明
-
 # Feishu for Codex 贡献指南
 
 欢迎一起改进 Feishu for Codex。这个项目欢迎来自 Codex、飞书、MCP、智能体 workflow 实战中的具体贡献。
+
+[English](#english)
 
 ## 可以贡献什么
 
@@ -115,7 +44,7 @@ scripts/smoke-test.sh
 ```md
 ## Summary
 
-- 
+-
 
 ## Verification
 
@@ -137,3 +66,74 @@ scripts/smoke-test.sh
 - 如何验证
 - 涉及哪些权限或租户设置
 - 还有哪些已知限制
+
+---
+
+## English
+
+# Contributing to Feishu for Codex
+
+Thanks for helping improve Feishu for Codex. This project welcomes practical contributions from people building with Codex, Feishu, MCP, and agent workflows.
+
+## What To Contribute
+
+High-signal contributions are preferred:
+
+- Feishu workflow improvements: IM, Docs, Wiki, Bitable, Webhook, permissions, or OAuth flows.
+- MCP runtime fixes: tool schemas, error handling, token modes, local diagnostics, and smoke tests.
+- AI tuning tips: prompts, agent instructions, workflow patterns, or evaluation notes that worked in real projects.
+- Troubleshooting notes: install failures, permission gotchas, token issues, Feishu console settings, and recovery steps.
+- `AGENTS.md` rules: concise project rules that helped Codex work better in your own repo.
+- Real verification notes: practical writeups about what worked, what failed, and how the behavior was verified.
+
+Please avoid:
+
+- Secrets, tokens, private chat logs, private documents, or screenshots with sensitive tenant data.
+- Broad rewrites without a concrete bug, use case, or maintenance benefit.
+- Pure marketing copy that does not help users install, debug, or build.
+
+## Pull Request Process
+
+1. Open an issue first for large changes, new tool families, or behavior changes.
+2. Keep PRs focused. A docs fix, a runtime fix, and a workflow note should usually be separate PRs.
+3. Run the smoke test before submitting:
+
+```bash
+scripts/smoke-test.sh
+```
+
+4. For code changes, include:
+   - What changed
+   - Why it changed
+   - How you verified it
+   - Any Feishu permission or tenant requirement
+5. For docs changes, make sure links are relative and examples do not expose private IDs.
+6. For screenshots, redact tenant names, user names, chat IDs, document titles, and tokens.
+
+## Suggested PR Template
+
+```md
+## Summary
+
+-
+
+## Verification
+
+- [ ] `scripts/smoke-test.sh`
+- [ ] Manual Feishu verification, if applicable:
+
+## Notes
+
+- Required permissions:
+- Known limitations:
+```
+
+## Verification Notes
+
+If you submit docs or workflow notes, prefer concrete evidence:
+
+- What changed?
+- What environment was used?
+- How was it verified?
+- Which permissions or tenant settings mattered?
+- What remains a known limitation?

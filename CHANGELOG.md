@@ -2,76 +2,66 @@
 
 所有重要变更统一记录在这里。
 
-## [0.3.2] - 2026-06-04
+## [1.0.0] - 2026-06-04
 
 ### Added
 
-- 轻量日报入口：
-  - `npm run feishu -- digest --preview`
-  - `npm run feishu -- digest --send --confirm`
-- 仓库内置 digest 包装脚本，复用现有 Feishu 项目更新发送链路。
-- `/ids` 命令，用于快速获取当前 `chat_id`、`open_id` 和 allowlist 配置片段。
-- 更丰富的 `/status` 输出，补充 bridge command、runner command 和本地 service 摘要。
-
-### Changed
-
-- 默认日报、周报推送改为更偏向中文输出。
-- 默认 digest 模板已经完整中文化，适合真实私人助理推送场景。
-- 文档改为推荐仓库外 macOS `launchd` 示例，不再扩展为第二套内建调度子系统。
-
-### Fixed
-
-- 修正了一次真实联调里使用错误 Feishu `App ID` 导致的消息无法进入本地 bot 问题。
-- 增加基于 `message_id` 的重复投递保护，避免重复执行和重复回复。
-- 收口本地联调说明，减少 bot 运行状态、`launchd` service 状态和真实推送状态之间的混淆。
-
-### Verification
-
-- `bash scripts/smoke-test.sh`
-- `scripts/check-sensitive-values.sh`
-- `npm run feishu -- digest --preview`
-- `npm run feishu -- digest --send --confirm`
-- 真实飞书 bot bridge 回复链路验证通过
-
-## [0.3.0-beta] - 2026-06-04
-
-### Added
-
-- 统一 CLI 入口：`npm run feishu -- <command>`
-- Feishu bot bridge：`message -> runner -> downstream command -> reply`
-- 仓库内置 runner 和 echo 本地验证路径
-- 最小命令集：`/help`、`/new`、`/status`、`/stop`、`/cd <path>`
+- 飞书长连接 bot bridge：`message -> runner -> downstream command -> reply`。
+- 统一 CLI 入口：`npm run feishu -- <command>`。
+- 仓库内置 runner 和 echo 验证路径，方便先验证 bridge，再接真实 `codex exec`。
+- 最小聊天命令集：
+  - `/help`
+  - `/new`
+  - `/status`
+  - `/ids`
+  - `/stop`
+  - `/cd <path>`
 - 访问控制：
   - owner
   - admins
   - allowed users
   - allowed chats
-- 串行队列、短窗口批处理、重复消息幂等保护
-- macOS 优先的 `launchd` service 管理
+- 串行队列、短窗口批处理、重复消息幂等保护。
+- macOS 优先的 `launchd` service 管理：
+  - `start`
+  - `stop`
+  - `restart`
+  - `status`
+- 轻量日报入口：
+  - `npm run feishu -- digest --preview`
+  - `npm run feishu -- digest --send --confirm`
+- 稳定 HTTP-backed `feishu-mcp`，覆盖 IM、Docs、Wiki、Contacts 以及通用 OpenAPI 请求。
 
 ### Changed
 
-- 插件从本地消息协议 demo 推进为可控、可常驻运行的飞书协作入口。
+- README 调整为中文优先，突出亮点和快速接入路径。
+- 默认 digest 文案和模板改为中文，更适合飞书私人助理推送场景。
+- 项目文档结构收口为：
+  - `README.md`
+  - `CHANGELOG.md`
+  - `docs/roadmap.md`
+  - `docs/pre-release-checklist.md`
+  - `docs/dev_task.md`
+- 定时日报不作为内建 schedule 子系统，只提供轻量脚本和仓库外 `launchd` 示例。
+
+### Fixed
+
+- 修正真实联调中错误 Feishu `App ID` 导致的消息无法进入本地 bot 问题。
+- 增加基于 `message_id` 的重复投递保护，避免飞书重试导致重复执行和重复回复。
+- 收口本地联调说明，减少 bot 运行状态、`launchd` service 状态和真实推送状态之间的混淆。
+- 清理旧文档目录与旧 GitHub 用户名引用，Codex 白皮书统一指向 `aipmer/book`。
 
 ### Verification
 
-- `scripts/smoke-test.sh`
-- 真实飞书群 echo 联调
-- 真实 `codex exec` bridge 联调
-- `launchd start/status/restart/stop` 联调
+- `bash scripts/smoke-test.sh`
+- `scripts/check-sensitive-values.sh`
+- `npm run feishu -- help`
+- `npm run feishu -- digest --preview`
+- `npm run feishu -- webhook --self-test`
+- 真实飞书 bot bridge 回复链路验证通过
+- 真实私人助理推送与轻量 digest 发送验证通过
 
-## [0.1.1] - 2026-05-24
+### Notes
 
-### Added
-
-- Webhook 接收服务与本地自测脚本
-- 本地 smoke test
-- 私人助理推送配置说明
-- 敏感信息发布前扫描脚本
-- 贡献说明与发布准备文档
-
-### Verification
-
-- MCP `initialize` / `tools/list`
-- Webhook fixtures、自测、签名与解密路径
-- 插件结构、脚本权限与配置检查
+- `1.0.0` 是当前开源发布口径的首个正式版本号。
+- 早期内部迭代能力已经合并进本版本，不再以 `0.x` 版本对外维护独立 release note。

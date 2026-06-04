@@ -69,7 +69,7 @@ data:
 
 ## Project Operation Templates
 
-Recommended v0.3 tables:
+Recommended project operation tables:
 
 - Project status
 - Release records
