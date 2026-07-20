@@ -37,6 +37,17 @@ else
   echo "info: FEISHU_USER_ACCESS_TOKEN is not set; run scripts/exchange-feishu-code.sh after browser authorization before using stable MCP tools"
 fi
 
+if [ -n "${FEISHU_BOT_OWNER_OPEN_ID:-}" ] || \
+  [ -n "${FEISHU_BOT_ADMINS:-}" ] || \
+  [ -n "${FEISHU_BOT_ALLOWED_USERS:-}" ] || \
+  [ -n "${FEISHU_BOT_ALLOWED_CHATS:-}" ]; then
+  echo "ok: bot access control is configured"
+else
+  echo "missing: configure FEISHU_BOT_OWNER_OPEN_ID or an explicit bot allowlist"
+  echo "info: the long-connection bot will not execute local commands without access control"
+  missing=2
+fi
+
 if [ "$missing" -eq 0 ]; then
   echo "Feishu plugin prerequisites look ready."
 else

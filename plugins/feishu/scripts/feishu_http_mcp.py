@@ -221,6 +221,44 @@ TOOLS = [
         },
     },
     {
+        "name": "docx_v1_document_create",
+        "description": "[Stable HTTP]-Create a user-owned Feishu Docx document.",
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "data": {"type": "object"},
+                "useUAT": {"type": "boolean"},
+            },
+        },
+    },
+    {
+        "name": "docx_v1_documentBlockChildren_create",
+        "description": "[Stable HTTP]-Append child blocks to a Feishu Docx block.",
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "path": {"type": "object"},
+                "data": {"type": "object"},
+                "params": {"type": "object"},
+                "useUAT": {"type": "boolean"},
+            },
+            "required": ["path", "data"],
+        },
+    },
+    {
+        "name": "drive_v1_meta_batchQuery",
+        "description": "[Stable HTTP]-Resolve Feishu document metadata and URLs.",
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "data": {"type": "object"},
+                "params": {"type": "object"},
+                "useUAT": {"type": "boolean"},
+            },
+            "required": ["data"],
+        },
+    },
+    {
         "name": "wiki_v1_node_search",
         "description": "[Stable HTTP]-Search Feishu Wiki nodes.",
         "inputSchema": {
@@ -255,6 +293,20 @@ TOOLS = [
                 "params": {"type": "object"},
             },
             "required": ["data"],
+        },
+    },
+    {
+        "name": "bitable_v1_appTableRecord_create",
+        "description": "[Stable HTTP]-Create one Feishu Bitable record.",
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "path": {"type": "object"},
+                "data": {"type": "object"},
+                "params": {"type": "object"},
+                "useUAT": {"type": "boolean"},
+            },
+            "required": ["path", "data"],
         },
     },
     {
@@ -345,6 +397,36 @@ def handle_tool_call(name, arguments):
         )
         return tool_result(payload)
 
+    if name == "docx_v1_document_create":
+        payload = client.request(
+            "POST",
+            "/open-apis/docx/v1/documents",
+            body=arguments.get("data"),
+            token_mode=token_mode_from_use_uat(arguments.get("useUAT"), default="user"),
+        )
+        return tool_result(payload)
+
+    if name == "docx_v1_documentBlockChildren_create":
+        path = arguments.get("path") or {}
+        payload = client.request(
+            "POST",
+            f"/open-apis/docx/v1/documents/{path['document_id']}/blocks/{path['block_id']}/children",
+            query=arguments.get("params"),
+            body=arguments.get("data"),
+            token_mode=token_mode_from_use_uat(arguments.get("useUAT"), default="user"),
+        )
+        return tool_result(payload)
+
+    if name == "drive_v1_meta_batchQuery":
+        payload = client.request(
+            "POST",
+            "/open-apis/drive/v1/metas/batch_query",
+            query=arguments.get("params"),
+            body=arguments.get("data"),
+            token_mode=token_mode_from_use_uat(arguments.get("useUAT"), default="user"),
+        )
+        return tool_result(payload)
+
     if name == "wiki_v1_node_search":
         payload = client.request(
             "POST",
@@ -371,6 +453,17 @@ def handle_tool_call(name, arguments):
             query=arguments.get("params"),
             body=arguments.get("data"),
             token_mode="tenant",
+        )
+        return tool_result(payload)
+
+    if name == "bitable_v1_appTableRecord_create":
+        path = arguments.get("path") or {}
+        payload = client.request(
+            "POST",
+            f"/open-apis/bitable/v1/apps/{path['app_token']}/tables/{path['table_id']}/records",
+            query=arguments.get("params"),
+            body=arguments.get("data"),
+            token_mode=token_mode_from_use_uat(arguments.get("useUAT"), default="user"),
         )
         return tool_result(payload)
 
@@ -442,7 +535,7 @@ def main():
                         "capabilities": {"tools": {"listChanged": False}},
                         "serverInfo": {
                             "name": "Feishu Stable HTTP MCP",
-                            "version": "1.0.0",
+                            "version": "1.1.0",
                         },
                     },
                 )

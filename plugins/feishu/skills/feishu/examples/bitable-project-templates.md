@@ -48,9 +48,9 @@ Fields:
 Example record:
 
 ```yaml
-Version: "v1.0.0"
-Date: "2026-06-04"
-Summary: "Stabilized Feishu bot bridge and project update workflow."
+Version: "v1.1.0"
+Date: "2026-07-20"
+Summary: "Added a Feishu-native project report workflow."
 Verification: "scripts/smoke-test.sh"
 Git Commit: "abc1234"
 Release Note URL: "https://example.com/changelog#100"

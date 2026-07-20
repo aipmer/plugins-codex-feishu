@@ -17,6 +17,7 @@ Commands:
   restart   Restart the Feishu bot service
   status    Show the Feishu bot service status
   push      Run the project update push command
+  report    Generate and optionally publish a Git-aware Feishu project report
   runner    Run the Feishu Codex runner
   webhook   Run the webhook receiver
   help      Show this help text
@@ -28,6 +29,7 @@ Examples:
   npm run feishu -- start
   npm run feishu -- status
   npm run feishu -- runner --print-payload
+  npm run feishu -- report --preview --mode weekly --query "project name"
   npm run feishu -- push --preview --message "Completed: shipped docs."
   npm run feishu -- webhook --self-test
 `;
@@ -68,6 +70,10 @@ const COMMANDS = {
   runner: {
     command: 'node',
     args: [path.join('plugins', 'feishu', 'scripts', 'feishu-codex-runner.js')],
+  },
+  report: {
+    command: 'python3',
+    args: [path.join('plugins', 'feishu', 'scripts', 'feishu-project-report.py')],
   },
   webhook: {
     command: 'python3',

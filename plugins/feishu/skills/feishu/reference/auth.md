@@ -2,7 +2,7 @@
 
 ## Required Credentials
 
-Use a Feishu self-built app for the first version.
+Use a Feishu self-built app.
 
 ```bash
 export FEISHU_APP_ID="cli_xxx"
@@ -74,6 +74,10 @@ export FEISHU_USER_ACCESS_TOKEN="<returned_user_access_token>"
 If the response field is `access_token`, treat it as the returned `user_access_token` from Feishu OAuth and export it as `FEISHU_USER_ACCESS_TOKEN`.
 
 The stable local MCP server uses `FEISHU_USER_ACCESS_TOKEN` automatically.
+
+## Bot Access Control
+
+Starting with v1.1.0, the long-connection bot fails closed. Configure at least one of `FEISHU_BOT_OWNER_OPEN_ID`, `FEISHU_BOT_ADMINS`, `FEISHU_BOT_ALLOWED_USERS`, or `FEISHU_BOT_ALLOWED_CHATS`. Without one, the service can start for diagnosis but no message can trigger a local command.
 
 ## App ID vs Recipient ID
 
@@ -168,3 +172,28 @@ Before blaming MCP runtime behavior, verify these Feishu app settings:
 - `http://localhost:3000/callback` is configured as a redirect URI
 - If the app page shows a `refresh user_access_token` switch, it is enabled
 - Required scopes are approved for the app and, when applicable, for user identity calls
+
+## 中文说明
+
+### 推荐认证路径
+
+1. 配置 `FEISHU_APP_ID` 和 `FEISHU_APP_SECRET`。
+2. 运行 `generate-feishu-auth-url.sh`，在浏览器完成用户授权。
+3. 用 `exchange-feishu-code.sh` 换取 `user_access_token`。
+4. 将 token 仅保存在本地 `FEISHU_USER_ACCESS_TOKEN` 环境变量中。
+
+应用身份适合机器人发消息；用户身份适合搜索 Docs/Wiki、创建用户持有的 Docx 和写入用户可访问的 Bitable。`App ID` 标识发送应用，`open_id` 标识消息接收人，两者不能混用。
+
+### Bot 访问控制
+
+从 `v1.1.0` 开始，长连接 bot 默认拒绝执行。必须至少配置 `FEISHU_BOT_OWNER_OPEN_ID`、`FEISHU_BOT_ADMINS`、`FEISHU_BOT_ALLOWED_USERS` 或 `FEISHU_BOT_ALLOWED_CHATS` 中的一项。未配置时服务仍可启动用于诊断，但任何消息都不能触发本地命令。
+
+### 最小权限
+
+- 消息：`im:message:readonly`、`im:message:send_as_bot`
+- 群聊：`im:chat`、`im:chat.members:read`
+- Docs：读取、创建和编辑新版文档所需的 `docx` 权限
+- Wiki：`wiki:wiki:readonly`
+- Drive：文档元数据与链接查询所需权限
+- Bitable：`bitable:app`
+- 需要刷新用户 token 时增加 `offline_access`

@@ -6,8 +6,8 @@ Feishu for Codex should stay focused on the Feishu ecosystem for the next one or
 
 ### Current Direction
 
-- v1.1: private assistant push, project digest previews, setup diagnostics, Docs/Wiki retrieval, and write-back workflows.
-- v1.2: Feishu Base/Bitable workflows for project status, tasks, risks, release records, and community case intake.
+- v1.1: Git-aware project reports with Docs/Wiki retrieval, Docx write-back, message delivery, and optional Project Status records.
+- v1.2: deepen reusable Bitable workflows for releases, risks, and community case intake.
 - Community growth: real case studies, practical setup notes, and contributor workflows around Feishu + Codex.
 
 ### Platform Decision
@@ -33,8 +33,8 @@ Feishu for Codex 后续一到两个版本建议继续聚焦飞书生态。
 
 ### 当前方向
 
-- v1.1：私人助理推送、项目更新预览、配置诊断、Docs/Wiki 检索和写回流程。
-- v1.2：飞书 Base / 多维表格，用于项目状态、任务、风险、发布记录和社区案例收集。
+- v1.1：Git 项目进展、Docs/Wiki 检索、Docx 写回、消息推送和可选 Project Status 记录闭环。
+- v1.2：继续深化发布、风险和社区案例收集等可复用 Bitable 工作流。
 - 社区增长：围绕 Feishu + Codex 沉淀真实案例、配置指引和贡献流程。
 
 ### 平台决策

@@ -33,6 +33,7 @@ require_file "${PLUGIN_DIR}/scripts/feishu-long-connection-bot.js"
 require_file "${PLUGIN_DIR}/scripts/feishu-codex-runner.js"
 require_file "${PLUGIN_DIR}/scripts/feishu-codex-echo.js"
 require_file "${PLUGIN_DIR}/scripts/feishu-project-update.js"
+require_file "${PLUGIN_DIR}/scripts/feishu-project-report.py"
 require_file "${PLUGIN_DIR}/scripts/feishu_webhook_server.py"
 require_file "${PLUGIN_DIR}/scripts/test-feishu-webhook.py"
 require_file "${PLUGIN_DIR}/skills/feishu/examples/quickstart-message-bot.md"
@@ -57,6 +58,7 @@ require_executable "${PLUGIN_DIR}/scripts/feishu-long-connection-bot.js"
 require_executable "${PLUGIN_DIR}/scripts/feishu-codex-runner.js"
 require_executable "${PLUGIN_DIR}/scripts/feishu-codex-echo.js"
 require_executable "${PLUGIN_DIR}/scripts/feishu-project-update.js"
+require_executable "${PLUGIN_DIR}/scripts/feishu-project-report.py"
 require_executable "${PLUGIN_DIR}/scripts/feishu_http_mcp.py"
 require_executable "${PLUGIN_DIR}/scripts/feishu_webhook_server.py"
 require_executable "${PLUGIN_DIR}/scripts/test-feishu-webhook.py"
@@ -167,6 +169,10 @@ required_tools = {
     "im_v1_message_list",
     "im_v1_message_create",
     "docx_builtin_search",
+    "docx_v1_document_create",
+    "docx_v1_documentBlockChildren_create",
+    "drive_v1_meta_batchQuery",
+    "bitable_v1_appTableRecord_create",
     "wiki_v1_node_search",
     "feishu_openapi_request",
 }
@@ -519,6 +525,25 @@ if (!allowedByChat.allowed || allowedByChat.reason !== 'allowed_chat') {
   throw new Error(`expected allowed_chat authorization, got ${JSON.stringify(allowedByChat)}`);
 }
 
+const unconfigured = bot.authorizeMessage(event, {
+  ownerOpenId: '',
+  admins: new Set(),
+  allowedUsers: new Set(),
+  allowedChats: new Set(),
+});
+if (unconfigured.allowed || unconfigured.reason !== 'access_not_configured') {
+  throw new Error(`expected access_not_configured, got ${JSON.stringify(unconfigured)}`);
+}
+const unconfiguredMessage = bot.buildAccessDeniedMessage({
+  ownerOpenId: '',
+  admins: new Set(),
+  allowedUsers: new Set(),
+  allowedChats: new Set(),
+});
+if (!unconfiguredMessage.includes('local execution is disabled') || unconfiguredMessage.includes('App Secret')) {
+  throw new Error(`unexpected unconfigured message: ${unconfiguredMessage}`);
+}
+
 const blocked = bot.authorizeMessage(event, {
   ownerOpenId: 'ou_owner',
   admins: new Set(['ou_admin']),
@@ -836,6 +861,208 @@ if ! rg -q "Invalid receive_id_type" /tmp/feishu-project-update-invalid.txt; the
   fail "project update invalid receive_id_type message missing"
 fi
 ok "project update invalid receive_id_type path passed"
+
+if FEISHU_APP_ID=cli_xxx FEISHU_APP_SECRET=xxx \
+  "${PLUGIN_DIR}/scripts/doctor-feishu-auth.sh" >/tmp/feishu-doctor-no-access.txt 2>&1; then
+  fail "doctor should block missing bot access control"
+else
+  doctor_status=$?
+  if [[ "${doctor_status}" -ne 2 ]]; then
+    fail "doctor missing access control should exit 2, got ${doctor_status}"
+  fi
+fi
+if ! rg -q "explicit bot allowlist" /tmp/feishu-doctor-no-access.txt; then
+  fail "doctor missing access control hint missing"
+fi
+ok "doctor fail-closed access control path passed"
+
+python3 - <<'PY' "${REPO_ROOT}"
+import importlib.util
+import contextlib
+import io
+import json
+import pathlib
+import subprocess
+import sys
+import tempfile
+
+repo_root = pathlib.Path(sys.argv[1])
+script_dir = repo_root / "plugins" / "feishu" / "scripts"
+sys.path.insert(0, str(script_dir))
+spec = importlib.util.spec_from_file_location("feishu_project_report", script_dir / "feishu-project-report.py")
+report_module = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(report_module)
+
+parser = report_module.build_parser()
+options = parser.parse_args(["--mode", "custom", "--workspace", str(repo_root)])
+problems = report_module.validate_options(options)
+if not any("--since is required" in item for item in problems):
+    raise SystemExit(f"custom mode validation missing: {problems}")
+
+options = parser.parse_args(["--max-sources", "6", "--workspace", str(repo_root)])
+problems = report_module.validate_options(options)
+if not any("--max-sources" in item for item in problems):
+    raise SystemExit(f"max sources validation missing: {problems}")
+
+git_options = parser.parse_args(["--mode", "weekly", "--workspace", str(repo_root)])
+git_context = report_module.collect_git_context(repo_root, git_options)
+if not git_context["project"] or not git_context["branch"]:
+    raise SystemExit(f"invalid Git context: {git_context}")
+
+with tempfile.TemporaryDirectory(prefix="feishu-empty-git-") as temp_dir:
+    subprocess.run(["git", "init", "-q"], cwd=temp_dir, check=True)
+    empty_options = parser.parse_args(["--mode", "daily", "--workspace", temp_dir])
+    empty_context = report_module.collect_git_context(pathlib.Path(temp_dir), empty_options)
+    if empty_context["head"] != "unborn" or empty_context["commits"]:
+        raise SystemExit(f"unborn Git repository was not handled: {empty_context}")
+
+valid_report = {
+    "title": "Test",
+    "summary": "Summary",
+    "status": "In Progress",
+    "completed": ["One"],
+    "in_progress": ["Two"],
+    "risks": [],
+    "next_steps": ["Three"],
+    "sources": [],
+}
+report_module.validate_report(valid_report)
+try:
+    report_module.validate_report({**valid_report, "status": "Unknown"})
+except RuntimeError:
+    pass
+else:
+    raise SystemExit("invalid report status should fail")
+
+blocks = report_module.report_to_blocks(valid_report, [])
+if not any(item.get("heading2") for item in blocks) or not any(item.get("bullet") for item in blocks):
+    raise SystemExit(f"report blocks are incomplete: {blocks}")
+
+class FakeClient:
+    def request(self, method, path, **kwargs):
+        if path.endswith("/search/object"):
+            return {"data": {"docs_entities": [{"docs_token": "dox_test_1", "title": "Doc One"}]}}
+        if path.endswith("/raw_content"):
+            return {"data": {"content": "x" * 40000}}
+        raise AssertionError((method, path, kwargs))
+
+original_client = report_module.client
+report_module.client = FakeClient()
+sources = report_module.collect_feishu_sources(["project"], 3)
+report_module.client = original_client
+if len(sources) != 1 or len(sources[0]["content"]) != report_module.MAX_CONTEXT_CHARS or not sources[0]["truncated"]:
+    raise SystemExit(f"source truncation failed: {sources}")
+
+class FakeWikiClient:
+    def request(self, method, path, **kwargs):
+        if path.endswith("/search/object"):
+            return {"data": {"docs_entities": []}}
+        if path.endswith("/nodes/search"):
+            return {"data": {"items": [{"node_token": "wik_test", "title": "Wiki One"}]}}
+        if path.endswith("/spaces/get_node"):
+            return {"data": {"node": {"obj_type": "docx", "obj_token": "dox_wiki", "title": "Wiki One"}}}
+        if path.endswith("/raw_content"):
+            return {"data": {"content": "wiki content"}}
+        raise AssertionError((method, path, kwargs))
+
+report_module.client = FakeWikiClient()
+wiki_sources = report_module.collect_feishu_sources(["project"], 3)
+report_module.client = original_client
+if len(wiki_sources) != 1 or wiki_sources[0]["kind"] != "wiki" or wiki_sources[0]["token"] != "dox_wiki":
+    raise SystemExit(f"Wiki fallback failed: {wiki_sources}")
+
+original_run_command = report_module.run_command
+def timeout_command(*args, **kwargs):
+    raise subprocess.TimeoutExpired(cmd="codex", timeout=1)
+report_module.run_command = timeout_command
+try:
+    report_module.generate_report(git_context, [], git_options)
+except subprocess.TimeoutExpired:
+    pass
+else:
+    raise SystemExit("Codex timeout should propagate")
+finally:
+    report_module.run_command = original_run_command
+
+calls = []
+original_create_document = report_module.create_document
+original_create_bitable = report_module.create_bitable_record
+original_send = report_module.send_message
+report_module.create_document = lambda report, sources: calls.append("doc") or {"document_id": "doc", "url": "url"}
+def fail_bitable(report, git_context):
+    calls.append("bitable")
+    raise RuntimeError("bitable failed")
+report_module.create_bitable_record = fail_bitable
+report_module.send_message = lambda report, document: calls.append("send") or {"message_id": "message"}
+write_options = parser.parse_args(["--write-doc", "--bitable", "--send", "--confirm"])
+try:
+    with contextlib.redirect_stderr(io.StringIO()):
+        report_module.execute_writes(write_options, valid_report, [], git_context)
+except RuntimeError:
+    pass
+else:
+    raise SystemExit("expected Bitable failure")
+finally:
+    report_module.create_document = original_create_document
+    report_module.create_bitable_record = original_create_bitable
+    report_module.send_message = original_send
+if calls != ["doc", "bitable"]:
+    raise SystemExit(f"message should not send after Bitable failure: {calls}")
+
+print("ok: project report workflow checks passed")
+PY
+
+python3 - <<'PY' "${REPO_ROOT}"
+import importlib.util
+import pathlib
+import sys
+
+repo_root = pathlib.Path(sys.argv[1])
+mcp_path = repo_root / "plugins" / "feishu" / "scripts" / "feishu_http_mcp.py"
+spec = importlib.util.spec_from_file_location("feishu_http_mcp_test", mcp_path)
+mcp = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(mcp)
+
+calls = []
+class FakeClient:
+    def request(self, method, path, **kwargs):
+        calls.append((method, path, kwargs))
+        return {"code": 0, "data": {}}
+
+mcp.client = FakeClient()
+mcp.handle_tool_call("docx_v1_document_create", {"data": {"title": "Report"}, "useUAT": True})
+mcp.handle_tool_call("docx_v1_documentBlockChildren_create", {
+    "path": {"document_id": "doc", "block_id": "doc"},
+    "data": {"children": []},
+    "useUAT": True,
+})
+mcp.handle_tool_call("drive_v1_meta_batchQuery", {"data": {"request_docs": []}, "useUAT": True})
+mcp.handle_tool_call("bitable_v1_appTableRecord_create", {
+    "path": {"app_token": "base", "table_id": "table"},
+    "data": {"fields": {}},
+    "useUAT": True,
+})
+
+expected_paths = [
+    "/open-apis/docx/v1/documents",
+    "/open-apis/docx/v1/documents/doc/blocks/doc/children",
+    "/open-apis/drive/v1/metas/batch_query",
+    "/open-apis/bitable/v1/apps/base/tables/table/records",
+]
+if [item[1] for item in calls] != expected_paths:
+    raise SystemExit(f"unexpected MCP routes: {calls}")
+if any(item[2].get("token_mode") != "user" for item in calls):
+    raise SystemExit(f"new MCP write tools must default to user token mode: {calls}")
+print("ok: MCP write tool routes and token modes passed")
+PY
+
+if ! python3 "${PLUGIN_DIR}/scripts/feishu-project-report.py" --help >/tmp/feishu-report-help.txt; then
+  fail "project report help failed"
+fi
+if ! rg -q -- "--write-doc" /tmp/feishu-report-help.txt; then
+  fail "project report help missing --write-doc"
+fi
+ok "project report help path passed"
 
 if ! FEISHU_APP_ID=cli_xxx FEISHU_APP_SECRET=xxx FEISHU_DEFAULT_RECEIVE_ID=ou_xxxxx FEISHU_DEFAULT_RECEIVE_ID_TYPE=open_id \
   node "${PLUGIN_DIR}/scripts/feishu-daily-digest.js" --preview >/tmp/feishu-daily-digest-preview.txt 2>&1; then

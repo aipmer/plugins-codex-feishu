@@ -18,6 +18,13 @@ Focus: message-triggered local execution, Docs and Wiki retrieval, private assis
 - 在 macOS 上通过 `launchd` 常驻运行
 - 访问控制、队列、状态反馈和最小命令体系
 
+## 先选对工具
+
+- **希望在飞书里远程操作本机 Claude Code / Codex CLI**：推荐使用 [lark-channel-bridge](https://github.com/zarazhangrui/lark-coding-agent-bridge)，它已经提供流式卡片、附件、多 profile 和跨平台后台服务。
+- **希望让 Codex 读取飞书 Docs / Wiki / Bitable，并把项目结果写回飞书**：使用本项目。
+
+两者可以同时安装。本项目不依赖 `lark-channel-bridge`，轻量消息 Bridge 继续保留维护，但不再追赶通用远程 Agent 功能。
+
 ## 亮点
 
 - **消息桥接**：`message -> runner -> downstream command -> reply`
@@ -36,6 +43,8 @@ Focus: message-triggered local execution, Docs and Wiki retrieval, private assis
    - 看「[5 分钟消息机器人快速接入](#5-分钟消息机器人快速接入)」
 3. **想先验证 bridge，不直接调用真实 Codex**
    - 看「[5 分钟 Codex Bridge 验证](#5-分钟-codex-bridge-验证)」
+4. **想自动生成并发布项目周报**
+   - 看「[项目报告自动化](#项目报告自动化)」
 
 ## 5 分钟私人助理推送
 
@@ -101,6 +110,7 @@ npm install
 ```env
 FEISHU_APP_ID=cli_xxx
 FEISHU_APP_SECRET=xxx
+FEISHU_BOT_OWNER_OPEN_ID=ou_xxx
 FEISHU_BOT_REPLY_TEXT=收到，我已接入 Codex Feishu 插件。
 FEISHU_DEFAULT_WORKSPACE=/absolute/path/to/your/workspace
 FEISHU_CODEX_COMMAND="node plugins/feishu/scripts/feishu-codex-runner.js"
@@ -108,7 +118,7 @@ FEISHU_CODEX_COMMAND_MODE=stdin
 FEISHU_RUNNER_COMMAND="codex exec"
 ```
 
-如果只想先测连通性，只配 `FEISHU_BOT_REPLY_TEXT` 即可。
+如果只想先测连通性，可以暂不配置 runner，但仍须设置 `FEISHU_BOT_OWNER_OPEN_ID` 或其他白名单变量。未配置访问控制时，bot 只返回安全提示，不会执行本地命令。
 如果要启用当前版本的最小 bridge，额外配置 `FEISHU_CODEX_COMMAND` 和 `FEISHU_RUNNER_COMMAND`。
 
 在飞书开放平台中：
@@ -151,6 +161,55 @@ FEISHU_CODEX_COMMAND_MODE=env
 
 验证通过后，再把 `FEISHU_RUNNER_COMMAND` 切回真实命令，例如 `codex exec`。
 
+## 项目报告自动化
+
+这条工作流会采集 Git 分支、提交、工作区状态和 diff stat，检索指定的飞书 Docs / Wiki，再让 Codex 生成结构化中文报告。它不会读取或上传完整源码。
+
+先预览：
+
+```bash
+npm run feishu -- report --preview \
+  --mode weekly \
+  --workspace /path/to/project \
+  --query "项目名称"
+```
+
+写回新版飞书文档并发送消息：
+
+```bash
+npm run feishu -- report \
+  --mode weekly \
+  --workspace /path/to/project \
+  --query "项目名称" \
+  --write-doc \
+  --send \
+  --confirm
+```
+
+可选追加 Project Status 多维表格记录：
+
+```bash
+npm run feishu -- report \
+  --mode weekly \
+  --workspace /path/to/project \
+  --query "项目名称" \
+  --write-doc \
+  --bitable \
+  --send \
+  --confirm
+```
+
+知识检索、文档创建和 Bitable 写入需要 `FEISHU_USER_ACCESS_TOKEN`。Bitable 模式还需要：
+
+```env
+FEISHU_PROJECT_NAME=Feishu for Codex
+FEISHU_PROJECT_OWNER=Your Name
+FEISHU_BITABLE_APP_TOKEN=bascn_xxxxx
+FEISHU_BITABLE_TABLE_ID=tbl_xxxxx
+```
+
+`--preview` 是默认模式。`--dry-run-json` 可输出报告、来源元数据和计划动作；所有真实写入都必须显式添加 `--confirm`。
+
 ## 核心命令
 
 统一 CLI：
@@ -164,6 +223,7 @@ npm run feishu -- stop
 npm run feishu -- restart
 npm run feishu -- status
 npm run feishu -- runner --print-payload
+npm run feishu -- report --preview --mode weekly --query "project name"
 npm run feishu -- push --preview --message "已完成：发布文档"
 npm run feishu -- webhook --self-test
 ```
@@ -215,7 +275,7 @@ npm run feishu -- webhook --self-test
 - `FEISHU_BOT_ALLOWED_USERS`
 - `FEISHU_BOT_ALLOWED_CHATS`
 
-如果这四项都不配，bot 默认开放；只要配置了任意一项，就会进入受控模式。
+从 `v1.1.0` 开始，如果四项都不配置，bot 会启动但进入 `access_not_configured` 状态，不会调用 Codex 或任何本地下游命令。现有用户升级后必须至少设置 owner、允许用户或允许群聊中的一项；项目不提供恢复默认开放的开关。
 
 当前队列行为：
 

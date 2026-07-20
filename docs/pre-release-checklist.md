@@ -1,6 +1,6 @@
 # Feishu for Codex Pre-Release Checklist
 
-这份清单面向 `v1.0.0` 及之后的版本发布前联调。目标不是只确认代码能跑，而是确认：
+这份清单面向 `v1.1.0` 及之后的版本发布前联调。目标不是只确认代码能跑，而是确认：
 
 - 真实飞书消息链路可用
 - 本地 service 管理可用
@@ -242,6 +242,19 @@ FEISHU_BOT_BATCH_WINDOW_MS=500
   - text messages first
 - 文档中的能力描述与真实联调证据一致
 
+### Project Report 联调
+
+```bash
+npm run feishu -- report --preview --mode weekly --query "项目名称"
+npm run feishu -- report --mode weekly --query "项目名称" --write-doc --send --confirm
+```
+
+- preview 不创建文档、Base 记录或消息
+- Codex 进程使用 `read-only` 和 `ephemeral`
+- 新版 Docx 归当前 UAT 用户所有并返回可访问 URL
+- 启用 `--bitable` 时，Project Status 字段与模板一致
+- 文档或 Base 失败后，不继续发送最终消息
+
 ---
 
 ## 7. 建议发布顺序
@@ -254,13 +267,13 @@ FEISHU_BOT_BATCH_WINDOW_MS=500
 4. 跑通 `launchd start/status/restart/stop`
 5. 补截图和证据
 6. 检查 README、CHANGELOG 与 dev_task
-7. 发布 `v1.0.0`
+7. 发布 `v1.1.0`
 
 ---
 
 ## 8. 发布门槛
 
-满足以下条件，才建议发 `v1.0.0`：
+满足以下条件，才建议发 `v1.1.0`：
 
 - 本地 smoke 全通过
 - 真实飞书群 echo 联调通过
@@ -270,5 +283,6 @@ FEISHU_BOT_BATCH_WINDOW_MS=500
 - 至少有一条串行排队路径被验证
 - 重复消息幂等保护已通过本地测试
 - README、CHANGELOG 与 dev_task 已更新
+- 项目报告真实私人助理推送通过
 
 如果以上任一项没有证据，建议不要直接发正式 beta。

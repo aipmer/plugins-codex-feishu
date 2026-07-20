@@ -1,6 +1,6 @@
 {
   "name": "feishu",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Open-source Feishu plugin for Codex with stable IM, Docs, Wiki, and team workflow capabilities.",
   "author": {
     "name": "Hunk Wu",
@@ -34,6 +34,7 @@
     "privacyPolicyURL": "https://www.feishu.cn/privacy",
     "termsOfServiceURL": "https://www.feishu.cn/terms",
     "defaultPrompt": [
+      "Generate a Git-aware project report, write it to Feishu Docs, and send the link.",
       "Draft a Codex project update and send it to Feishu.",
       "Search Feishu Docs and Wiki for this topic.",
       "Summarize the latest messages in this Feishu group."

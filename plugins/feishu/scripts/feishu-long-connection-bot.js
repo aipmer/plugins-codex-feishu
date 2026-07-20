@@ -104,7 +104,7 @@ function authorizeMessage(data, config = getAccessControlConfig()) {
   const senderOpenId = getSenderOpenId(data);
 
   if (!isAccessControlled(config)) {
-    return { allowed: true, reason: 'open' };
+    return { allowed: false, reason: 'access_not_configured' };
   }
 
   if (config.allowedChats.has(chatId)) {
@@ -132,7 +132,10 @@ function authorizeMessage(data, config = getAccessControlConfig()) {
 
 function buildAccessDeniedMessage(config = getAccessControlConfig(), context = {}) {
   if (!isAccessControlled(config)) {
-    return 'Access control is not configured.';
+    return [
+      'Access control is not configured, so local execution is disabled.',
+      'Set FEISHU_BOT_OWNER_OPEN_ID or an explicit user/chat allowlist, then restart the bot.',
+    ].join('\n');
   }
 
   const enabled = [];
@@ -969,6 +972,9 @@ async function start() {
   console.log('Feishu long-connection bot starting...');
   console.log('Listening for im.message.receive_v1 text messages.');
   console.log(`State dir: ${getStateDir()}`);
+  if (!isAccessControlled(getAccessControlConfig())) {
+    console.log('Access control is not configured. Local execution is disabled until an owner or allowlist is set.');
+  }
   if (!getExecutionCommand()) {
     console.log('FEISHU_CODEX_COMMAND is not configured yet. Non-command messages will return a setup hint.');
   }

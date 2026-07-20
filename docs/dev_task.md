@@ -1,5 +1,32 @@
 # Dev Task Log
 
+## 2026-07-20 · v1.1.0
+
+### 今日更新
+
+- 明确产品分工：本项目聚焦 Codex 调用飞书原生协作能力；通用远程 Agent 场景推荐 `lark-channel-bridge`。
+- 长连接 bot 改为默认拒绝执行，未配置访问控制时不会 spawn 本地命令。
+- 新增 Git-aware 项目报告 CLI，覆盖 Docs/Wiki 检索、结构化 Codex 总结、Docx 写回、消息推送和可选 Bitable 记录。
+- 稳定 MCP 增加 Docx 创建、块写入、文档 URL 和 Bitable record 工具。
+- 统一 `Apache-2.0` 许可证和 `v1.1.0` 版本元数据。
+- 更新 README、路线图、工作流、认证、文档和 Bitable 指引。
+
+### 关键边界
+
+- 不新增流式卡片、附件、多 profile 或跨平台 daemon。
+- Git 采集只包含提交、状态和 diff stat，不读取完整源码。
+- Codex 生成固定使用 `read-only` 和 `ephemeral`。
+- 所有真实飞书写入必须显式使用 `--confirm`；Bitable 默认关闭。
+
+### 验证结果
+
+- `bash scripts/smoke-test.sh` 通过。
+- `scripts/check-sensitive-values.sh` 通过。
+- 未配置访问控制时，本地执行保持关闭，`doctor` 返回退出码 `2`。
+- 项目报告 preview、dry run、失败顺序和 MCP 工具路由通过自动化检查。
+- 使用标题「Codex Feishu v1.1 验证」完成一次真实私人助理周报推送。
+- 当前环境未配置 `FEISHU_USER_ACCESS_TOKEN`，Docs/Wiki 检索、Docx 写回和 Bitable 真实写入留待 UAT 配置后验证；对应模拟链路已通过 smoke test。
+
 ## 2026-06-04 · v1.0.0
 
 ### 今日更新

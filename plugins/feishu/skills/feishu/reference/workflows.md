@@ -42,22 +42,33 @@ Recommended path:
 2. If no good result appears, search Wiki with the same keyword.
 3. Resolve the final document token and read the selected Docx content.
 4. Summarize into `Background`, `Key Points`, `Risks`, and `Suggested Next Actions`.
-5. Import the final Markdown into Feishu Docs with `useUAT: true` if the current user should open it directly.
+5. Create a Docx document and append structured blocks with `useUAT: true`.
 6. Send the created document reference back to the target chat.
 
 Failure path guidance:
 
 - No document found: refine the search key or switch from Docs to Wiki.
 - Wiki result does not resolve to Docx: inspect the node object type first.
-- Read works but import fails: check `docs:document:import`.
-- Import succeeds but the user cannot open the doc: verify user visibility and Drive permissions.
+- Read works but document creation fails: check `docx:document` user-identity permissions.
+- Creation succeeds but URL lookup fails: check `drive:drive` and document visibility.
 
 See `examples/docs-wiki-to-doc.md`.
+
+## Git-Aware Project Report
+
+Recommended command:
+
+```bash
+npm run feishu -- report --preview --mode weekly --query "project name"
+npm run feishu -- report --mode weekly --query "project name" --write-doc --send --confirm
+```
+
+The command collects Git metadata without reading full source files, retrieves up to three Docs/Wiki sources, runs Codex in read-only ephemeral mode, writes a user-owned Docx document, and sends the final message. Add `--bitable` only when the Project Status table is already configured.
 
 ## Write Automation Result to Bitable
 
 1. Locate `app_token` and `table_id`.
-2. Use `feishu_openapi_request` to query or update the relevant Bitable endpoint.
+2. Use `bitable_v1_appTableRecord_create` for a Project Status record.
 3. Create or update the record.
 4. Push a concise completion message to Feishu IM.
 
@@ -147,14 +158,14 @@ npm run feishu:project-update -- --send --confirm --title "Codex 周报" --file 
 2. 没有合适结果时，再搜索 Wiki
 3. 解析最终文档 token，并读取 Docx 内容
 4. 总结成 `Background`、`Key Points`、`Risks`、`Suggested Next Actions`
-5. 用 `useUAT: true` 导入新文档
+5. 用 `useUAT: true` 创建新版 Docx 并写入块
 6. 把文档引用再发回飞书消息
 
 失败路径建议：
 
 - 搜不到文档：换关键词，或从 Docs 切到 Wiki
 - Wiki 结果无法映射到 Docx：先检查节点对象类型
-- 能读不能写：检查 `docs:document:import`
+- 能读不能写：检查用户身份的 `docx:document` 权限
 - 写回成功但用户打不开：检查可见范围和 Drive 权限
 
 ### 将结果写入多维表格
@@ -166,7 +177,16 @@ npm run feishu:project-update -- --send --confirm --title "Codex 周报" --file 
 - Risk tracker
 - Case study intake
 
-如果当前 MCP 还没有你要用的稳定 Bitable wrapper，先走 `feishu_openapi_request`。当前阶段重点是交付接入范式，不是完整抽象层。
+Project Status 记录直接使用 `bitable_v1_appTableRecord_create`；其他尚未封装的 endpoint 再走 `feishu_openapi_request`。当前阶段重点是交付接入范式，不是完整抽象层。
+
+### Git 项目报告闭环
+
+```bash
+npm run feishu -- report --preview --mode weekly --query "项目名称"
+npm run feishu -- report --mode weekly --query "项目名称" --write-doc --send --confirm
+```
+
+命令只采集 Git 元数据和 diff stat，不读取完整源码；随后检索最多 3 个 Docs/Wiki 来源，以只读临时模式调用 Codex，创建用户持有的 Docx，并在所有持久化步骤完成后发送消息。只有已有 Project Status 表时才添加 `--bitable`。
 
 ### 事件订阅扩展
 

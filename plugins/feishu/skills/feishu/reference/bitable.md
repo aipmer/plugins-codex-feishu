@@ -85,7 +85,8 @@ Recommended first two tables:
 
 Current wrapper boundary:
 
-- If the MCP runtime does not yet expose a stable first-class Bitable wrapper for your exact endpoint, use `feishu_openapi_request` as the transition path.
+- Project Status record creation is available through `bitable_v1_appTableRecord_create`.
+- For other Bitable endpoints, use `feishu_openapi_request` as the transition path.
 - The current stage focuses on reusable project operation templates, not a full Base abstraction layer.
 
 ## 中文说明
@@ -125,5 +126,6 @@ Current wrapper boundary:
 
 ### 当前边界
 
-- 如果当前 MCP 还没有覆盖你要调用的稳定 Bitable endpoint，先用 `feishu_openapi_request`
+- Project Status 记录可以直接使用 `bitable_v1_appTableRecord_create`
+- 其他尚未封装的 Bitable endpoint 继续使用 `feishu_openapi_request`
 - 当前阶段交付的是项目运营模板和接入范式，不是完整的 Base ORM 或通用同步框架

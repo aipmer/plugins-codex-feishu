@@ -2,6 +2,28 @@
 
 所有重要变更统一记录在这里。
 
+## [1.1.0] - 2026-07-20
+
+### Added
+
+- 新增 `npm run feishu -- report` 项目报告工作流：采集 Git 元数据、检索 Docs/Wiki、只读调用 Codex、创建新版 Docx、可选写入 Project Status，并最终发送飞书消息。
+- 稳定 MCP 新增 Docx 创建、文档块写入、文档 URL 查询和 Bitable 单条记录写入工具。
+- 报告命令支持 `daily`、`weekly`、`custom`、重复 `--query`、来源上限、结构化 dry run 和显式确认。
+
+### Changed
+
+- 长连接 bot 改为默认拒绝执行；必须配置 owner、admin、允许用户或允许群聊。
+- 路线图收口到飞书原生协作，不再追赶流式卡片、附件、多 profile 和跨平台 daemon。
+- README 增加与 `lark-channel-bridge` 的场景分工和共存指引。
+- 项目许可证元数据统一为 `Apache-2.0`。
+
+### Verification
+
+- `bash scripts/smoke-test.sh`
+- `scripts/check-sensitive-values.sh`
+- `npm run feishu -- report --help`
+- 真实飞书私人助理项目报告推送
+
 ## [1.0.0] - 2026-06-04
 
 ### Added

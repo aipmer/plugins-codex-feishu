@@ -22,9 +22,11 @@ Use this skill when the user asks to operate Feishu, Feishu Docs, Wiki, groups, 
 - Messages: `im_v1_message_create`, `im_v1_message_list`
 - Groups: `im_v1_chat_list`, `im_v1_chatMembers_get`
 - Docs: `docx_builtin_search`, `docx_v1_document_rawContent`
+- Docs write-back: `docx_v1_document_create`, `docx_v1_documentBlockChildren_create`, `drive_v1_meta_batchQuery`
 - Wiki: `wiki_v1_node_search`, `wiki_v2_space_getNode`
 - Contacts: `contact_v3_user_batchGetId`
 - Generic fallback: `feishu_openapi_request`
+- Bitable record write: `bitable_v1_appTableRecord_create`
 - Webhook receiver: `scripts/feishu_webhook_server.py`
 - Private assistant push script: `scripts/feishu-project-update.js`
 
@@ -89,6 +91,7 @@ useUAT: true
 - Group summary: summarize recent group messages into decisions, action items, blockers, and owners.
 - Bot reply: search Docs or Wiki, compose an answer, and push it back to a target Feishu chat.
 - Codex project digest push: summarize project progress and push an update into a Feishu chat on a schedule.
+- Feishu-native project report: collect Git progress, retrieve Docs/Wiki context, generate a structured report, write a Docx document, and optionally append a Bitable record before message delivery.
 - Private assistant push: preview a Codex project update, send a short test message, then send the final update to a user's `open_id`.
 - Docs/Wiki write-back: search knowledge, summarize with Codex, and import the result into a Feishu Doc.
 - Bitable project operations: sync project status, risks, release records, and case study intake into Feishu Base/Bitable.
