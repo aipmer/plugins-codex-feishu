@@ -34,7 +34,7 @@ fi
 if [ -n "${FEISHU_USER_ACCESS_TOKEN:-}" ]; then
   echo "ok: FEISHU_USER_ACCESS_TOKEN is set; user token mode can be used directly"
 else
-  echo "info: FEISHU_USER_ACCESS_TOKEN is not set; run scripts/exchange-feishu-code.sh after browser authorization before using stable MCP tools"
+  echo "info: FEISHU_USER_ACCESS_TOKEN is not set; run npm run feishu -- auth, or plugins/feishu/scripts/exchange-feishu-code.sh after browser authorization"
 fi
 
 if [ -n "${FEISHU_BOT_OWNER_OPEN_ID:-}" ] || \

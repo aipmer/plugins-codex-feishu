@@ -34,6 +34,7 @@ require_file "${PLUGIN_DIR}/scripts/feishu-codex-runner.js"
 require_file "${PLUGIN_DIR}/scripts/feishu-codex-echo.js"
 require_file "${PLUGIN_DIR}/scripts/feishu-project-update.js"
 require_file "${PLUGIN_DIR}/scripts/feishu-project-report.py"
+require_file "${PLUGIN_DIR}/scripts/feishu-oauth-callback.py"
 require_file "${PLUGIN_DIR}/scripts/feishu_webhook_server.py"
 require_file "${PLUGIN_DIR}/scripts/test-feishu-webhook.py"
 require_file "${PLUGIN_DIR}/skills/feishu/examples/quickstart-message-bot.md"
@@ -59,6 +60,7 @@ require_executable "${PLUGIN_DIR}/scripts/feishu-codex-runner.js"
 require_executable "${PLUGIN_DIR}/scripts/feishu-codex-echo.js"
 require_executable "${PLUGIN_DIR}/scripts/feishu-project-update.js"
 require_executable "${PLUGIN_DIR}/scripts/feishu-project-report.py"
+require_executable "${PLUGIN_DIR}/scripts/feishu-oauth-callback.py"
 require_executable "${PLUGIN_DIR}/scripts/feishu_http_mcp.py"
 require_executable "${PLUGIN_DIR}/scripts/feishu_webhook_server.py"
 require_executable "${PLUGIN_DIR}/scripts/test-feishu-webhook.py"
@@ -388,7 +390,7 @@ cli_help_check = subprocess.run(
 )
 if cli_help_check.returncode != 0 or "Commands:" not in cli_help_check.stdout:
     raise SystemExit(cli_help_check.stderr or cli_help_check.stdout or "cli help failed")
-for required in ["start", "stop", "restart", "status"]:
+for required in ["auth", "start", "stop", "restart", "status"]:
     if required not in cli_help_check.stdout:
         raise SystemExit(f"cli help missing service command: {required}")
 print("ok: feishu codex cli help check passed")
@@ -1084,6 +1086,9 @@ if ! node "${REPO_ROOT}/scripts/feishu-codex.js" help >/tmp/feishu-codex-help.tx
 fi
 if ! rg -q "digest" /tmp/feishu-codex-help.txt; then
   fail "feishu CLI help missing digest command"
+fi
+if ! rg -q "auth" /tmp/feishu-codex-help.txt; then
+  fail "feishu CLI help missing auth command"
 fi
 ok "feishu CLI digest help path passed"
 

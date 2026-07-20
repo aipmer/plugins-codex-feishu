@@ -12,6 +12,7 @@ Commands:
   bot       Run the Feishu long-connection bot
   digest    Render or send the lightweight daily digest
   doctor    Run auth and environment checks
+  auth      Run localhost OAuth callback and write FEISHU_USER_ACCESS_TOKEN
   start     Start the Feishu bot via launchd
   stop      Stop the Feishu bot service
   restart   Restart the Feishu bot service
@@ -24,6 +25,7 @@ Commands:
 
 Examples:
   npm run feishu -- doctor
+  npm run feishu -- auth
   npm run feishu -- digest --preview
   npm run feishu -- bot
   npm run feishu -- start
@@ -42,6 +44,10 @@ const COMMANDS = {
   doctor: {
     command: 'node',
     args: [path.join('scripts', 'feishu-doctor.js')],
+  },
+  auth: {
+    command: 'python3',
+    args: [path.join('plugins', 'feishu', 'scripts', 'feishu-oauth-callback.py')],
   },
   start: {
     command: 'node',

@@ -11,13 +11,13 @@ export FEISHU_APP_SECRET="xxx"
 
 ## Recommended Auth Path
 
-Prefer manual code exchange over upstream beta login flows and use the stable local MCP server for production use.
+Prefer the local callback flow over manual code copy. It avoids short-lived authorization code expiry and writes tokens only to the local `.env` file.
 
-1. Generate or open the Feishu authorization URL in a browser.
-2. After Feishu redirects to `http://localhost:3000/callback?...`, copy the `code` query parameter.
-3. Exchange that code with `scripts/exchange-feishu-code.sh`.
-4. Export the returned `user_access_token` as `FEISHU_USER_ACCESS_TOKEN`.
-5. Start Codex with the default `feishu-mcp` entry, which uses the local HTTP-backed server and reads `FEISHU_USER_ACCESS_TOKEN`.
+1. Configure `FEISHU_APP_ID` and `FEISHU_APP_SECRET`.
+2. Run `npm run feishu -- auth`.
+3. Open the printed `AUTH_URL` in a browser and authorize the app.
+4. Wait for the browser page to show `授权完成，可以回到 Codex。`.
+5. Run `npm run feishu -- doctor` to verify `FEISHU_USER_ACCESS_TOKEN`.
 
 The exchange script uses Feishu's current OAuth token endpoint `authen/v2/oauth/token`, not the legacy `authen/v1/access_token`.
 
@@ -33,45 +33,85 @@ command -v python3
 
 If `python3` is unavailable, install Python 3 first.
 
-## Manual Code Exchange
+## Local Callback Auth
 
-Export the app credentials first:
+Export the app credentials first, or put them in `.env`:
 
 ```bash
 export FEISHU_APP_ID="cli_xxx"
 export FEISHU_APP_SECRET="xxx"
 ```
 
-Then exchange the callback code:
+Run:
 
 ```bash
-scripts/generate-feishu-auth-url.sh
+npm run feishu -- auth
 ```
 
-Open the printed URL, authorize, then exchange the callback code:
+Open the printed `AUTH_URL`. The command listens on `http://localhost:3000/callback`, exchanges the callback code immediately, then writes:
+
+```env
+FEISHU_USER_ACCESS_TOKEN=...
+FEISHU_USER_REFRESH_TOKEN=...
+```
+
+Use a narrower or broader scope when needed:
 
 ```bash
-scripts/exchange-feishu-code.sh --code "<callback_code>"
+npm run feishu -- auth -- --scope "offline_access wiki:wiki:readonly bitable:app"
 ```
 
 Optional flags:
 
 ```bash
-scripts/generate-feishu-auth-url.sh \
+npm run feishu -- auth -- \
+  --redirect-uri "http://localhost:3000/callback" \
+  --port 3000 \
+  --timeout-seconds 240
+```
+
+## Manual Code Exchange
+
+Manual exchange is a fallback when the local callback port is unavailable.
+
+Export the app credentials first, or put them in `.env`:
+
+```bash
+export FEISHU_APP_ID="cli_xxx"
+export FEISHU_APP_SECRET="xxx"
+```
+
+Generate the authorization URL:
+
+```bash
+plugins/feishu/scripts/generate-feishu-auth-url.sh
+```
+
+Open the printed URL, authorize, then exchange the callback code:
+
+```bash
+plugins/feishu/scripts/exchange-feishu-code.sh --code "<callback_code>"
+```
+
+Optional flags:
+
+```bash
+plugins/feishu/scripts/generate-feishu-auth-url.sh \
   --scope "offline_access im:chat im:message"
 
-scripts/exchange-feishu-code.sh \
+plugins/feishu/scripts/exchange-feishu-code.sh \
   --code "<callback_code>" \
   --redirect-uri "http://localhost:3000/callback"
 ```
 
-The script prints the raw Feishu response. On success, export the token:
+The script prints the raw Feishu response. On success, write the returned token to `.env` or export it for the current shell:
 
 ```bash
 export FEISHU_USER_ACCESS_TOKEN="<returned_user_access_token>"
 ```
 
 If the response field is `access_token`, treat it as the returned `user_access_token` from Feishu OAuth and export it as `FEISHU_USER_ACCESS_TOKEN`.
+If the response includes `refresh_token`, store it locally as `FEISHU_USER_REFRESH_TOKEN`.
 
 The stable local MCP server uses `FEISHU_USER_ACCESS_TOKEN` automatically.
 
@@ -88,6 +128,7 @@ Do not confuse the app identity with the message recipient identity.
 | `FEISHU_APP_ID` | `cli_xxx` | Identifies your Feishu self-built app. | No real value. Use placeholders only. |
 | `FEISHU_APP_SECRET` | `xxx` | App credential used to obtain tenant tokens. | Never. |
 | `FEISHU_USER_ACCESS_TOKEN` | `u-xxx` | OAuth user token for user-owned resources. | Never. |
+| `FEISHU_USER_REFRESH_TOKEN` | `ur-xxx` | OAuth refresh token for renewing user access. | Never. |
 | `open_id` | `ou_xxxxx` | Identifies a Feishu user as a message recipient. | No real value. Use placeholders only. |
 | `chat_id` | `oc_xxxxx` | Identifies a Feishu group or private chat. | No real value. Use placeholders only. |
 
@@ -178,9 +219,10 @@ Before blaming MCP runtime behavior, verify these Feishu app settings:
 ### 推荐认证路径
 
 1. 配置 `FEISHU_APP_ID` 和 `FEISHU_APP_SECRET`。
-2. 运行 `generate-feishu-auth-url.sh`，在浏览器完成用户授权。
-3. 用 `exchange-feishu-code.sh` 换取 `user_access_token`。
-4. 将 token 仅保存在本地 `FEISHU_USER_ACCESS_TOKEN` 环境变量中。
+2. 运行 `npm run feishu -- auth`。
+3. 打开命令输出的 `AUTH_URL`，在浏览器完成用户授权。
+4. 等浏览器显示「授权完成，可以回到 Codex。」
+5. 脚本会自动换取 token，并仅写入本地 `.env` 的 `FEISHU_USER_ACCESS_TOKEN` 和 `FEISHU_USER_REFRESH_TOKEN`。
 
 应用身份适合机器人发消息；用户身份适合搜索 Docs/Wiki、创建用户持有的 Docx 和写入用户可访问的 Bitable。`App ID` 标识发送应用，`open_id` 标识消息接收人，两者不能混用。
 

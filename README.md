@@ -165,6 +165,14 @@ FEISHU_CODEX_COMMAND_MODE=env
 
 这条工作流会采集 Git 分支、提交、工作区状态和 diff stat，检索指定的飞书 Docs / Wiki，再让 Codex 生成结构化中文报告。它不会读取或上传完整源码。
 
+知识检索、文档创建和 Bitable 写入需要用户身份 token。先运行本地回调授权：
+
+```bash
+npm run feishu -- auth
+```
+
+打开命令输出的 `AUTH_URL` 并完成授权。浏览器显示「授权完成，可以回到 Codex。」后，脚本会把 `FEISHU_USER_ACCESS_TOKEN` 和 `FEISHU_USER_REFRESH_TOKEN` 写入本地 `.env`。这些值已被 `.gitignore` 忽略，不要写进文档、截图或提交。
+
 先预览：
 
 ```bash
@@ -216,6 +224,7 @@ FEISHU_BITABLE_TABLE_ID=tbl_xxxxx
 
 ```bash
 npm run feishu -- doctor
+npm run feishu -- auth
 npm run feishu -- digest --preview
 npm run feishu -- bot
 npm run feishu -- start
