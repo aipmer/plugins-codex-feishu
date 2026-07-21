@@ -10,6 +10,7 @@ import urllib.parse
 BASE_URL = "https://open.feishu.cn"
 JSONRPC_VERSION = "2.0"
 USER_TOKEN_ENV = "FEISHU_USER_ACCESS_TOKEN"
+USER_REFRESH_TOKEN_ENV = "FEISHU_USER_REFRESH_TOKEN"
 
 
 def _non_empty_env(name):
@@ -29,6 +30,7 @@ class FeishuClient:
         self.app_id = _non_empty_env("FEISHU_APP_ID")
         self.app_secret = _non_empty_env("FEISHU_APP_SECRET")
         self.user_access_token = _non_empty_env(USER_TOKEN_ENV)
+        self.user_refresh_token = _non_empty_env(USER_REFRESH_TOKEN_ENV)
         self._tenant_token = None
         self._tenant_token_expires_at = 0
 
@@ -61,6 +63,69 @@ class FeishuClient:
         self._tenant_token_expires_at = now + expires_in
         return token
 
+    def _persist_user_tokens(self, access_token, refresh_token=None):
+        env_path = os.environ.get("FEISHU_ENV_FILE", ".env")
+        try:
+            with open(env_path, "r", encoding="utf-8") as fh:
+                lines = fh.read().splitlines()
+        except FileNotFoundError:
+            lines = []
+
+        def upsert(name, value):
+            if not value:
+                return
+            line = f"{name}={value}"
+            for index, existing in enumerate(lines):
+                if existing.startswith(name + "="):
+                    lines[index] = line
+                    return
+            lines.append(line)
+
+        upsert(USER_TOKEN_ENV, access_token)
+        upsert(USER_REFRESH_TOKEN_ENV, refresh_token)
+        with open(env_path, "w", encoding="utf-8") as fh:
+            fh.write("\n".join(lines) + "\n")
+
+    def refresh_user_token(self):
+        if not self.user_refresh_token:
+            raise FeishuError(
+                f"{USER_REFRESH_TOKEN_ENV} is required to refresh an expired user token."
+            )
+        if not self.app_id or not self.app_secret:
+            raise FeishuError("FEISHU_APP_ID and FEISHU_APP_SECRET are required to refresh user token.")
+
+        payload = self._raw_request(
+            "POST",
+            "/open-apis/authen/v2/oauth/token",
+            body={
+                "grant_type": "refresh_token",
+                "refresh_token": self.user_refresh_token,
+                "client_id": self.app_id,
+                "client_secret": self.app_secret,
+            },
+            auth_token=None,
+        )
+        data = payload.get("data") if isinstance(payload.get("data"), dict) else payload
+        token = data.get("user_access_token") or data.get("access_token")
+        refresh_token = data.get("refresh_token") or data.get("user_refresh_token")
+        if not token:
+            raise FeishuError("Failed to refresh user access token.", payload=payload)
+        self.user_access_token = token
+        if refresh_token:
+            self.user_refresh_token = refresh_token
+        self._persist_user_tokens(self.user_access_token, self.user_refresh_token)
+        return self.user_access_token
+
+    def _is_expired_user_token_error(self, exc):
+        payload = getattr(exc, "payload", None)
+        if not isinstance(payload, dict):
+            return False
+        message = " ".join(
+            str(payload.get(key, ""))
+            for key in ("msg", "error", "error_description", "message")
+        ).lower()
+        return "expired" in message or "invalid access token" in message
+
     def request(self, method, path, *, query=None, body=None, token_mode="user"):
         if token_mode == "tenant":
             token = self.get_tenant_token()
@@ -71,7 +136,13 @@ class FeishuClient:
         else:
             raise FeishuError(f"Unsupported token mode: {token_mode}")
 
-        return self._raw_request(method, path, query=query, body=body, auth_token=token)
+        try:
+            return self._raw_request(method, path, query=query, body=body, auth_token=token)
+        except FeishuError as exc:
+            if token_mode != "user" or not self._is_expired_user_token_error(exc):
+                raise
+            token = self.refresh_user_token()
+            return self._raw_request(method, path, query=query, body=body, auth_token=token)
 
     def _raw_request(self, method, path, *, query=None, body=None, auth_token=None):
         url = BASE_URL + path
@@ -535,7 +606,7 @@ def main():
                         "capabilities": {"tools": {"listChanged": False}},
                         "serverInfo": {
                             "name": "Feishu Stable HTTP MCP",
-                            "version": "1.1.0",
+                            "version": "1.1.1",
                         },
                     },
                 )

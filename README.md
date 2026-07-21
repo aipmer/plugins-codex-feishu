@@ -173,6 +173,8 @@ npm run feishu -- auth
 
 打开命令输出的 `AUTH_URL` 并完成授权。浏览器显示「授权完成，可以回到 Codex。」后，脚本会把 `FEISHU_USER_ACCESS_TOKEN` 和 `FEISHU_USER_REFRESH_TOKEN` 写入本地 `.env`。这些值已被 `.gitignore` 忽略，不要写进文档、截图或提交。
 
+后续用户身份请求如果遇到 access token 过期，会自动使用 `FEISHU_USER_REFRESH_TOKEN` 续期并重试。长期使用 Docs/Wiki、Docx 写回或 Bitable 写入时，建议保留 refresh token。
+
 先预览：
 
 ```bash

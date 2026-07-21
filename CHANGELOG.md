@@ -2,6 +2,23 @@
 
 所有重要变更统一记录在这里。
 
+## [1.1.1] - 2026-07-21
+
+### Added
+
+- 用户身份 OpenAPI 请求在 `FEISHU_USER_ACCESS_TOKEN` 过期时，会自动使用 `FEISHU_USER_REFRESH_TOKEN` 续期并重试原请求。
+
+### Changed
+
+- Bitable 项目状态写入完成真实 UAT，`report --write-doc --bitable --send --confirm` 已验证可创建 Docx、写入 Project Status 记录并发送私聊消息。
+- `FEISHU_USER_REFRESH_TOKEN` 成为 Docs/Wiki、Docx 和 Bitable 长时间使用场景的推荐配置。
+
+### Verification
+
+- `bash scripts/smoke-test.sh`
+- `scripts/check-sensitive-values.sh`
+- 真实飞书 Bitable UAT：Project Status 记录写入成功
+
 ## [1.1.0] - 2026-07-20
 
 ### Added

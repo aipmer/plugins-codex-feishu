@@ -114,6 +114,7 @@ If the response field is `access_token`, treat it as the returned `user_access_t
 If the response includes `refresh_token`, store it locally as `FEISHU_USER_REFRESH_TOKEN`.
 
 The stable local MCP server uses `FEISHU_USER_ACCESS_TOKEN` automatically.
+If `FEISHU_USER_REFRESH_TOKEN` is available, the stable local MCP server refreshes an expired user access token, writes the renewed token back to `.env`, and retries the original request once.
 
 ## Bot Access Control
 
@@ -225,6 +226,7 @@ Before blaming MCP runtime behavior, verify these Feishu app settings:
 5. 脚本会自动换取 token，并仅写入本地 `.env` 的 `FEISHU_USER_ACCESS_TOKEN` 和 `FEISHU_USER_REFRESH_TOKEN`。
 
 应用身份适合机器人发消息；用户身份适合搜索 Docs/Wiki、创建用户持有的 Docx 和写入用户可访问的 Bitable。`App ID` 标识发送应用，`open_id` 标识消息接收人，两者不能混用。
+如果本地存在 `FEISHU_USER_REFRESH_TOKEN`，稳定 MCP 会在用户 access token 过期时自动续期、写回 `.env` 并重试原请求一次。
 
 ### Bot 访问控制
 

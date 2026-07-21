@@ -1058,6 +1058,71 @@ if any(item[2].get("token_mode") != "user" for item in calls):
 print("ok: MCP write tool routes and token modes passed")
 PY
 
+python3 - <<'PY' "${REPO_ROOT}"
+import importlib.util
+import os
+import pathlib
+import tempfile
+import sys
+
+repo_root = pathlib.Path(sys.argv[1])
+mcp_path = repo_root / "plugins" / "feishu" / "scripts" / "feishu_http_mcp.py"
+spec = importlib.util.spec_from_file_location("feishu_http_mcp_refresh_test", mcp_path)
+mcp = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(mcp)
+
+with tempfile.TemporaryDirectory() as temp_dir:
+    env_path = pathlib.Path(temp_dir) / ".env"
+    env_path.write_text(
+        "\n".join([
+            "FEISHU_APP_ID=cli_xxx",
+            "FEISHU_APP_SECRET=secret",
+            "FEISHU_USER_ACCESS_TOKEN=old-token",
+            "FEISHU_USER_REFRESH_TOKEN=refresh-token",
+        ]) + "\n",
+        encoding="utf-8",
+    )
+    os.environ["FEISHU_APP_ID"] = "cli_xxx"
+    os.environ["FEISHU_APP_SECRET"] = "secret"
+    os.environ["FEISHU_USER_ACCESS_TOKEN"] = "old-token"
+    os.environ["FEISHU_USER_REFRESH_TOKEN"] = "refresh-token"
+    os.environ["FEISHU_ENV_FILE"] = str(env_path)
+
+    client = mcp.FeishuClient()
+    calls = []
+
+    def fake_raw(method, path, *, query=None, body=None, auth_token=None):
+        calls.append((method, path, auth_token, body))
+        if len(calls) == 1:
+            raise mcp.FeishuError("Authentication token expired. Please request a new one.", payload={
+                "code": 99991663,
+                "msg": "Authentication token expired. Please request a new one.",
+            })
+        if path == "/open-apis/authen/v2/oauth/token":
+            return {
+                "code": 0,
+                "access_token": "new-token",
+                "refresh_token": "new-refresh-token",
+            }
+        return {"code": 0, "data": {"ok": True}}
+
+    client._raw_request = fake_raw
+    payload = client.request("GET", "/open-apis/authen/v1/user_info", token_mode="user")
+    if payload.get("data", {}).get("ok") is not True:
+        raise SystemExit("refresh retry did not return final payload")
+    if [item[1] for item in calls] != [
+        "/open-apis/authen/v1/user_info",
+        "/open-apis/authen/v2/oauth/token",
+        "/open-apis/authen/v1/user_info",
+    ]:
+        raise SystemExit(f"unexpected refresh call order: {calls}")
+    text = env_path.read_text(encoding="utf-8")
+    if "FEISHU_USER_ACCESS_TOKEN=new-token" not in text or "FEISHU_USER_REFRESH_TOKEN=new-refresh-token" not in text:
+        raise SystemExit("refreshed tokens were not persisted")
+
+print("ok: user token auto-refresh path passed")
+PY
+
 if ! python3 "${PLUGIN_DIR}/scripts/feishu-project-report.py" --help >/tmp/feishu-report-help.txt; then
   fail "project report help failed"
 fi
