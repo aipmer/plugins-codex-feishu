@@ -34,6 +34,7 @@ require_file "${PLUGIN_DIR}/scripts/feishu-codex-runner.js"
 require_file "${PLUGIN_DIR}/scripts/feishu-codex-echo.js"
 require_file "${PLUGIN_DIR}/scripts/feishu-project-update.js"
 require_file "${PLUGIN_DIR}/scripts/feishu-project-report.py"
+require_file "${PLUGIN_DIR}/scripts/feishu-portfolio-report.py"
 require_file "${PLUGIN_DIR}/scripts/feishu-bitable-bootstrap.py"
 require_file "${PLUGIN_DIR}/scripts/feishu-oauth-callback.py"
 require_file "${PLUGIN_DIR}/scripts/feishu_webhook_server.py"
@@ -49,6 +50,7 @@ require_file "${REPO_ROOT}/docs/platform-roadmap.md"
 require_file "${REPO_ROOT}/CHANGELOG.md"
 require_file "${REPO_ROOT}/docs/dev_task.md"
 require_file "${REPO_ROOT}/.env.example"
+require_file "${REPO_ROOT}/examples/projects.example.json"
 require_file "${REPO_ROOT}/package.json"
 require_file "${REPO_ROOT}/scripts/feishu-codex.js"
 require_file "${REPO_ROOT}/scripts/feishu-service.js"
@@ -61,6 +63,7 @@ require_executable "${PLUGIN_DIR}/scripts/feishu-codex-runner.js"
 require_executable "${PLUGIN_DIR}/scripts/feishu-codex-echo.js"
 require_executable "${PLUGIN_DIR}/scripts/feishu-project-update.js"
 require_executable "${PLUGIN_DIR}/scripts/feishu-project-report.py"
+require_executable "${PLUGIN_DIR}/scripts/feishu-portfolio-report.py"
 require_executable "${PLUGIN_DIR}/scripts/feishu-bitable-bootstrap.py"
 require_executable "${PLUGIN_DIR}/scripts/feishu-oauth-callback.py"
 require_executable "${PLUGIN_DIR}/scripts/feishu_http_mcp.py"
@@ -392,10 +395,83 @@ cli_help_check = subprocess.run(
 )
 if cli_help_check.returncode != 0 or "Commands:" not in cli_help_check.stdout:
     raise SystemExit(cli_help_check.stderr or cli_help_check.stdout or "cli help failed")
-for required in ["auth", "bitable-bootstrap", "start", "stop", "restart", "status"]:
+for required in ["auth", "bitable-bootstrap", "portfolio-report", "start", "stop", "restart", "status"]:
     if required not in cli_help_check.stdout:
         raise SystemExit(f"cli help missing service command: {required}")
 print("ok: feishu codex cli help check passed")
+
+portfolio_help_check = subprocess.run(
+    ["node", str(repo_root / "scripts" / "feishu-codex.js"), "portfolio-report", "--help"],
+    stdout=subprocess.PIPE,
+    stderr=subprocess.PIPE,
+    text=True,
+    check=False,
+    cwd=str(repo_root),
+)
+if portfolio_help_check.returncode != 0 or "--projects-file" not in portfolio_help_check.stdout:
+    raise SystemExit(portfolio_help_check.stderr or portfolio_help_check.stdout or "portfolio-report help failed")
+print("ok: portfolio report help check passed")
+
+portfolio_module_check = subprocess.run(
+    [
+        "python3",
+        "-c",
+        """
+import importlib.util
+import json
+import pathlib
+import sys
+import tempfile
+
+path = pathlib.Path('plugins/feishu/scripts/feishu-portfolio-report.py').resolve()
+sys.path.insert(0, str(path.parent))
+spec = importlib.util.spec_from_file_location('feishu_portfolio_report', path)
+module = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(module)
+
+with tempfile.TemporaryDirectory(prefix='feishu-portfolio-smoke-') as temp_dir:
+    projects_path = pathlib.Path(temp_dir) / 'projects.json'
+    projects_path.write_text(json.dumps({
+        'projects': [
+            {
+                'name': 'repo',
+                'workspace': str(pathlib.Path('.').resolve()),
+                'owner': 'Owner',
+                'enabled': True
+            },
+            {
+                'name': 'disabled',
+                'workspace': '/tmp/disabled',
+                'enabled': False
+            }
+        ]
+    }), encoding='utf-8')
+    projects = module.load_registry(projects_path)
+    if len(projects) != 1 or projects[0]['name'] != 'repo':
+        raise SystemExit('portfolio registry loading failed')
+
+    parser = module.build_parser()
+    options = parser.parse_args(['--projects-file', str(projects_path), '--mode', 'weekly'])
+    contexts = module.collect_projects(projects, options)
+    if contexts[0]['name'] != 'repo' or not contexts[0].get('available'):
+        raise SystemExit('portfolio git collection failed')
+
+    redacted = module.redact_context(contexts, False)
+    if 'workspace' in redacted[0]:
+        raise SystemExit('portfolio path redaction failed')
+
+print('ok: portfolio report local logic checks passed')
+        """,
+    ],
+    stdout=subprocess.PIPE,
+    stderr=subprocess.PIPE,
+    text=True,
+    check=False,
+    cwd=str(repo_root),
+)
+if portfolio_module_check.returncode != 0:
+    raise SystemExit(portfolio_module_check.stderr or portfolio_module_check.stdout)
+print(portfolio_module_check.stdout.strip())
 
 cli_runner_check = subprocess.run(
     ["node", str(repo_root / "scripts" / "feishu-codex.js"), "runner", "--print-payload"],

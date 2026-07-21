@@ -2,6 +2,27 @@
 
 所有重要变更统一记录在这里。
 
+## [1.3.0] - 2026-07-21
+
+### Added
+
+- 新增 `npm run feishu -- portfolio-report`，支持从项目清单生成多项目 Codex 总览报告。
+- 新增 `examples/projects.example.json`，用于维护本地多项目清单示例。
+- `portfolio-report` 支持 `--projects-file`、`--mode`、`--changed-only`、`--include-paths`、`--write-doc`、`--bitable`、`--send` 和 `--confirm`。
+- README 新增「全部项目总览」配置与使用路径，说明如何让飞书掌握多个 Codex 项目的更新。
+
+### Changed
+
+- 多项目总览默认只读取 Git 分支、最近提交、工作区状态和 diff stat，不读取完整源码。
+- 多项目总览默认不把本机完整路径写入飞书报告，需要本地调试时才使用 `--include-paths`。
+- 本地 `projects.json` 和 `projects.local.json` 默认忽略，仓库只提交占位示例。
+
+### Verification
+
+- `npm run feishu -- portfolio-report --help`
+- `bash scripts/smoke-test.sh`
+- `scripts/check-sensitive-values.sh`
+
 ## [1.2.0] - 2026-07-21
 
 ### Added

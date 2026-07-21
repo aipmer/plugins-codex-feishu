@@ -1,5 +1,30 @@
 # Dev Task Log
 
+## 2026-07-21 · v1.3.0
+
+### 今日更新
+
+- 新增多项目总览入口：`npm run feishu -- portfolio-report`。
+- 新增本地项目清单约定：通过 `FEISHU_PROJECTS_FILE` 或 `--projects-file` 指向 `projects.json`。
+- 新增 `examples/projects.example.json`，只放占位路径和占位姓名，真实项目路径保留在本地。
+- `.gitignore` 忽略 `projects.json` 和 `projects.local.json`，避免误提交本机项目路径。
+- 多项目总览默认采集每个仓库的 Git 分支、最近提交、工作区状态和 diff stat，不读取完整源码。
+- 多项目报告默认不把本机完整路径写入飞书内容；需要本地调试时才使用 `--include-paths`。
+- README 增加「全部项目总览」配置和命令说明。
+- 将版本元数据提升到 `1.3.0`。
+
+### 验证结果
+
+- `npm run feishu -- portfolio-report --help` 通过。
+- `scripts/smoke-test.sh` 已覆盖项目清单解析、Git 采集和路径脱敏逻辑。
+- 敏感信息扫描继续禁止真实飞书 App ID、Secret、open_id、chat_id、token 和 Bitable token 入库。
+
+### 后续事项
+
+- 可选增加组合报告的真实飞书 UAT：`--write-doc --bitable --send --confirm`。
+- 可选增加定时任务或 launchd 示例，让多项目周报自动推送。
+- 可选把 `Project Status` 扩展为多表方案：Release Records、Risk Tracker、Case Study Intake。
+
 ## 2026-07-21 · v1.2.0
 
 ### 今日更新

@@ -1,0 +1,18 @@
+{
+  "projects": [
+    {
+      "name": "plugins-codex-feishu",
+      "workspace": "/absolute/path/to/plugins-codex-feishu",
+      "owner": "Your Name",
+      "enabled": true,
+      "notes": "Feishu plugin for Codex project workflows."
+    },
+    {
+      "name": "your-next-project",
+      "workspace": "/absolute/path/to/your-next-project",
+      "owner": "Your Name",
+      "enabled": true,
+      "notes": "Optional short context for the portfolio report."
+    }
+  ]
+}

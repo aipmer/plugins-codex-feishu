@@ -132,6 +132,63 @@ npm run feishu -- report \
 - 所有真实写入都必须加 `--confirm`
 - 用户 access token 过期时，会自动用 `FEISHU_USER_REFRESH_TOKEN` 续期并重试
 
+## 进阶：全部项目总览
+
+如果你想让飞书掌握多个 Codex 项目的更新，不建议让插件自动扫描整台电脑。更稳妥的方式是维护一个本地项目清单，只把你确认要汇总的仓库放进去。
+
+先复制示例：
+
+```bash
+cp examples/projects.example.json projects.json
+```
+
+编辑 `projects.json`：
+
+```json
+{
+  "projects": [
+    {
+      "name": "your-project",
+      "workspace": "/absolute/path/to/your-project",
+      "owner": "Your Name",
+      "enabled": true
+    }
+  ]
+}
+```
+
+也可以在 `.env` 里固定路径：
+
+```env
+FEISHU_PROJECTS_FILE=/absolute/path/to/projects.json
+```
+
+预览全部项目周报：
+
+```bash
+npm run feishu -- portfolio-report --preview \
+  --projects-file ./projects.json \
+  --mode weekly
+```
+
+写回 Docx、同步 Bitable 并发送私聊：
+
+```bash
+npm run feishu -- portfolio-report \
+  --projects-file ./projects.json \
+  --mode weekly \
+  --write-doc \
+  --bitable \
+  --send \
+  --confirm
+```
+
+说明：
+
+- 默认只读取每个仓库的 Git 分支、最近提交、工作区状态和 diff stat
+- 默认不会把本机完整路径写进飞书报告；本地调试需要时再加 `--include-paths`
+- 如果只想看有变化的项目，加 `--changed-only`
+
 ## 进阶：Bitable 项目状态表
 
 如果你想把项目状态同步到飞书多维表格，先创建标准表：
@@ -212,6 +269,7 @@ npm run feishu:doctor
 npm run feishu:project-update -- --test --send --confirm
 npm run feishu -- auth
 npm run feishu -- report --preview --mode weekly --query "project name"
+npm run feishu -- portfolio-report --preview --projects-file ./projects.json
 npm run feishu -- bitable-bootstrap --preview --owner "Your Name"
 npm run feishu -- webhook --self-test
 ```
