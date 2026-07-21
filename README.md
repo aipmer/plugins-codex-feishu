@@ -1,11 +1,5 @@
 # Feishu for Codex
 
-Open-source Feishu plugin for Codex. Use Codex with Feishu messages, Docs, Wiki, Bitable, and project update workflows.
-
-面向国内用户的 Codex 飞书插件。先让 Codex 把项目更新推送到你的飞书私聊，再逐步接入 Docs/Wiki 检索、文档写回、多维表格记录和消息机器人。
-
-<img src="./plugins/feishu/assets/screenshots/plugin-detail-real.png" alt="Feishu 插件预览" width="720">
-
 ## 这是什么
 
 这个插件适合把 Codex 的工作结果沉淀到飞书：
@@ -251,22 +245,6 @@ FEISHU_BOT_ALLOWED_CHATS=oc_xxxxx
 ```
 
 默认拒绝执行是为了避免飞书消息意外触发本地命令。
-
-### 哪些信息不能提交到 Git？
-
-不要提交真实值：
-
-- `FEISHU_APP_ID`
-- `FEISHU_APP_SECRET`
-- `FEISHU_USER_ACCESS_TOKEN`
-- `FEISHU_USER_REFRESH_TOKEN`
-- `open_id`
-- `chat_id`
-- `message_id`
-- Bitable `app_token`
-- Bitable `table_id`
-
-仓库内示例只使用 `cli_xxx`、`ou_xxxxx`、`oc_xxxxx`、`bascn_xxxxx`、`tbl_xxxxx` 这类占位值。
 
 ## 安装到 Codex
 
