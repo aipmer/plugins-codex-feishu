@@ -1,5 +1,33 @@
 # Bitable
 
+## Recommended Bootstrap
+
+Use the built-in bootstrap command first when you only need the standard `Project Status` table for `report --bitable`:
+
+```bash
+npm run feishu -- bitable-bootstrap --preview --owner "Your Name"
+npm run feishu -- bitable-bootstrap --confirm --owner "Your Name"
+```
+
+The command creates a user-owned Base and `Project Status` table with these fields:
+
+- `Project`: text
+- `Status`: single select, values `Todo`, `In Progress`, `Blocked`, `Done`
+- `Owner`: text
+- `Next Step`: text
+- `Updated At`: date time
+
+By default it writes these values to the local `.env` file:
+
+```env
+FEISHU_PROJECT_NAME=Feishu for Codex
+FEISHU_PROJECT_OWNER=Your Name
+FEISHU_BITABLE_APP_TOKEN=bascn_xxxxx
+FEISHU_BITABLE_TABLE_ID=tbl_xxxxx
+```
+
+Use `--app-token` when you want to create the table in an existing Base. Use `--no-write-env` when you only want the returned IDs.
+
 ## Create Base
 
 ```yaml
@@ -92,6 +120,15 @@ Current wrapper boundary:
 ## 中文说明
 
 ### 创建 Base
+
+推荐先用内置命令创建标准 Project Status 表：
+
+```bash
+npm run feishu -- bitable-bootstrap --preview --owner "Your Name"
+npm run feishu -- bitable-bootstrap --confirm --owner "Your Name"
+```
+
+真实创建必须加 `--confirm`。命令会使用用户身份创建 Base / 表，并把 `FEISHU_BITABLE_APP_TOKEN`、`FEISHU_BITABLE_TABLE_ID` 写入本地 `.env`。
 
 可以先用 `bitable_v1_app_create` 创建一个新的 Base。
 如果创建后的 Base 需要当前用户直接打开，使用 `useUAT: true`。

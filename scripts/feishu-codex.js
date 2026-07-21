@@ -13,6 +13,8 @@ Commands:
   digest    Render or send the lightweight daily digest
   doctor    Run auth and environment checks
   auth      Run localhost OAuth callback and write FEISHU_USER_ACCESS_TOKEN
+  bitable-bootstrap
+            Create a Project Status Bitable table for report --bitable
   start     Start the Feishu bot via launchd
   stop      Stop the Feishu bot service
   restart   Restart the Feishu bot service
@@ -26,6 +28,7 @@ Commands:
 Examples:
   npm run feishu -- doctor
   npm run feishu -- auth
+  npm run feishu -- bitable-bootstrap --preview --owner "Your Name"
   npm run feishu -- digest --preview
   npm run feishu -- bot
   npm run feishu -- start
@@ -48,6 +51,10 @@ const COMMANDS = {
   auth: {
     command: 'python3',
     args: [path.join('plugins', 'feishu', 'scripts', 'feishu-oauth-callback.py')],
+  },
+  'bitable-bootstrap': {
+    command: 'python3',
+    args: [path.join('plugins', 'feishu', 'scripts', 'feishu-bitable-bootstrap.py')],
   },
   start: {
     command: 'node',

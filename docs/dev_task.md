@@ -1,26 +1,28 @@
 # Dev Task Log
 
-## 2026-07-21 · v1.1.1
+## 2026-07-21 · v1.2.0
 
 ### 今日更新
 
 - 完成 Bitable 真实 UAT：创建 `Codex Project Operations` Base 和 `Project Status` 表。
 - 验证 `report --write-doc --bitable --send --confirm` 可以同时创建 Docx、写入 Bitable 记录并发送私聊消息。
 - 在本地 Feishu HTTP client 中增加用户 token 自动刷新：当 `FEISHU_USER_ACCESS_TOKEN` 过期或失效时，使用 `FEISHU_USER_REFRESH_TOKEN` 续期，写回 `.env` 并重试原请求。
-- 将版本元数据提升到 `1.1.1`。
+- 新增 `npm run feishu -- bitable-bootstrap`，把 Base / Project Status 表创建流程产品化。
+- 将版本元数据提升到 `1.2.0`。
 
 ### 验证结果
 
 - 用户 token refresh 接口真实验证通过。
 - Bitable Project Status 表字段创建通过：`Project`、`Status`、`Owner`、`Next Step`、`Updated At`。
 - 真实 Bitable record 写入通过。
+- `npm run feishu -- bitable-bootstrap --preview --owner "Hunk Wu"` 通过。
 - `bash scripts/smoke-test.sh` 通过。
 - `scripts/check-sensitive-values.sh` 通过。
 
 ### 后续事项
 
 - 梳理 `media/` 目录，决定是否纳入公开素材或继续保留为本地未跟踪文件。
-- 可选补充 Base bootstrap 命令，把今天手动调用的 Base / 表创建流程产品化。
+- 可选继续补充 Release Records / Risk Tracker / Case Study Intake 的 bootstrap 模板。
 
 ## 2026-07-20 · v1.1.0
 

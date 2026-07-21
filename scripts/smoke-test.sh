@@ -34,6 +34,7 @@ require_file "${PLUGIN_DIR}/scripts/feishu-codex-runner.js"
 require_file "${PLUGIN_DIR}/scripts/feishu-codex-echo.js"
 require_file "${PLUGIN_DIR}/scripts/feishu-project-update.js"
 require_file "${PLUGIN_DIR}/scripts/feishu-project-report.py"
+require_file "${PLUGIN_DIR}/scripts/feishu-bitable-bootstrap.py"
 require_file "${PLUGIN_DIR}/scripts/feishu-oauth-callback.py"
 require_file "${PLUGIN_DIR}/scripts/feishu_webhook_server.py"
 require_file "${PLUGIN_DIR}/scripts/test-feishu-webhook.py"
@@ -60,6 +61,7 @@ require_executable "${PLUGIN_DIR}/scripts/feishu-codex-runner.js"
 require_executable "${PLUGIN_DIR}/scripts/feishu-codex-echo.js"
 require_executable "${PLUGIN_DIR}/scripts/feishu-project-update.js"
 require_executable "${PLUGIN_DIR}/scripts/feishu-project-report.py"
+require_executable "${PLUGIN_DIR}/scripts/feishu-bitable-bootstrap.py"
 require_executable "${PLUGIN_DIR}/scripts/feishu-oauth-callback.py"
 require_executable "${PLUGIN_DIR}/scripts/feishu_http_mcp.py"
 require_executable "${PLUGIN_DIR}/scripts/feishu_webhook_server.py"
@@ -390,7 +392,7 @@ cli_help_check = subprocess.run(
 )
 if cli_help_check.returncode != 0 or "Commands:" not in cli_help_check.stdout:
     raise SystemExit(cli_help_check.stderr or cli_help_check.stdout or "cli help failed")
-for required in ["auth", "start", "stop", "restart", "status"]:
+for required in ["auth", "bitable-bootstrap", "start", "stop", "restart", "status"]:
     if required not in cli_help_check.stdout:
         raise SystemExit(f"cli help missing service command: {required}")
 print("ok: feishu codex cli help check passed")
@@ -1130,6 +1132,18 @@ if ! rg -q -- "--write-doc" /tmp/feishu-report-help.txt; then
   fail "project report help missing --write-doc"
 fi
 ok "project report help path passed"
+
+if ! FEISHU_USER_ACCESS_TOKEN=uat FEISHU_USER_REFRESH_TOKEN=urt \
+  python3 "${PLUGIN_DIR}/scripts/feishu-bitable-bootstrap.py" --preview --owner "Hunk Wu" >/tmp/feishu-bitable-bootstrap-preview.json; then
+  fail "bitable bootstrap preview failed"
+fi
+if ! rg -q '"table_name": "Project Status"' /tmp/feishu-bitable-bootstrap-preview.json; then
+  fail "bitable bootstrap preview missing Project Status table"
+fi
+if ! rg -q '"field_name": "Next Step"' /tmp/feishu-bitable-bootstrap-preview.json; then
+  fail "bitable bootstrap preview missing Next Step field"
+fi
+ok "bitable bootstrap preview path passed"
 
 if ! FEISHU_APP_ID=cli_xxx FEISHU_APP_SECRET=xxx FEISHU_DEFAULT_RECEIVE_ID=ou_xxxxx FEISHU_DEFAULT_RECEIVE_ID_TYPE=open_id \
   node "${PLUGIN_DIR}/scripts/feishu-daily-digest.js" --preview >/tmp/feishu-daily-digest-preview.txt 2>&1; then

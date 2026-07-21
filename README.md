@@ -199,6 +199,9 @@ npm run feishu -- report \
 可选追加 Project Status 多维表格记录：
 
 ```bash
+npm run feishu -- bitable-bootstrap --preview --owner "Your Name"
+npm run feishu -- bitable-bootstrap --confirm --owner "Your Name"
+
 npm run feishu -- report \
   --mode weekly \
   --workspace /path/to/project \
@@ -218,6 +221,8 @@ FEISHU_BITABLE_APP_TOKEN=bascn_xxxxx
 FEISHU_BITABLE_TABLE_ID=tbl_xxxxx
 ```
 
+`bitable-bootstrap` 会创建 `Codex Project Operations` Base 和 `Project Status` 表，并把 `FEISHU_BITABLE_APP_TOKEN`、`FEISHU_BITABLE_TABLE_ID` 写入本地 `.env`。真实创建必须显式添加 `--confirm`。
+
 `--preview` 是默认模式。`--dry-run-json` 可输出报告、来源元数据和计划动作；所有真实写入都必须显式添加 `--confirm`。
 
 ## 核心命令
@@ -227,6 +232,7 @@ FEISHU_BITABLE_TABLE_ID=tbl_xxxxx
 ```bash
 npm run feishu -- doctor
 npm run feishu -- auth
+npm run feishu -- bitable-bootstrap --preview --owner "Your Name"
 npm run feishu -- digest --preview
 npm run feishu -- bot
 npm run feishu -- start

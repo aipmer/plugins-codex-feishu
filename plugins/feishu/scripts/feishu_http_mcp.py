@@ -606,7 +606,7 @@ def main():
                         "capabilities": {"tools": {"listChanged": False}},
                         "serverInfo": {
                             "name": "Feishu Stable HTTP MCP",
-                            "version": "1.1.1",
+                            "version": "1.2.0",
                         },
                     },
                 )
