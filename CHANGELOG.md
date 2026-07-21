@@ -9,16 +9,19 @@
 - 新增 `npm run feishu -- bitable-bootstrap`，可一键创建 `Codex Project Operations` Base 和 `Project Status` 表。
 - `bitable-bootstrap` 支持 `--preview`、`--dry-run-json`、`--confirm`、`--owner`、`--app-token` 和 `--no-write-env`。
 - Bootstrap 成功后可自动写入 `FEISHU_PROJECT_NAME`、`FEISHU_PROJECT_OWNER`、`FEISHU_BITABLE_APP_TOKEN` 和 `FEISHU_BITABLE_TABLE_ID` 到本地 `.env`。
+- 新增两张 README 图文介绍图，解释私人助理推送和项目报告闭环。
 
 ### Changed
 
 - README 和 Bitable reference 改为推荐先用 `bitable-bootstrap` 配置 `report --bitable`。
+- README 精简为中文新手优先结构，默认先引导跑通私人助理推送，再进入 Docs/Wiki、Docx 和 Bitable 进阶流程。
 
 ### Verification
 
 - `npm run feishu -- bitable-bootstrap --preview --owner "Hunk Wu"`
 - `bash scripts/smoke-test.sh`
 - `scripts/check-sensitive-values.sh`
+- README 图片路径和本地链接检查通过
 
 ## [1.1.1] - 2026-07-21
 

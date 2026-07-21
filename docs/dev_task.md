@@ -8,6 +8,8 @@
 - 验证 `report --write-doc --bitable --send --confirm` 可以同时创建 Docx、写入 Bitable 记录并发送私聊消息。
 - 在本地 Feishu HTTP client 中增加用户 token 自动刷新：当 `FEISHU_USER_ACCESS_TOKEN` 过期或失效时，使用 `FEISHU_USER_REFRESH_TOKEN` 续期，写回 `.env` 并重试原请求。
 - 新增 `npm run feishu -- bitable-bootstrap`，把 Base / Project Status 表创建流程产品化。
+- 精简 README 为中文新手优先结构，默认第一路径改为私人助理推送。
+- 新增两张 README 图文介绍图，用于解释私人助理推送和项目报告闭环。
 - 将版本元数据提升到 `1.2.0`。
 
 ### 验证结果
@@ -18,6 +20,7 @@
 - `npm run feishu -- bitable-bootstrap --preview --owner "Hunk Wu"` 通过。
 - `bash scripts/smoke-test.sh` 通过。
 - `scripts/check-sensitive-values.sh` 通过。
+- README 图片路径、本地链接和敏感信息扫描通过。
 
 ### 后续事项
 
